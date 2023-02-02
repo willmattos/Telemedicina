@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity @ORM\Table(name="medicos")
  */
-class Medico implements UserInterface, \Serializable 
+class Medico 
 {
     /**
      * @ORM\Id @ORM\Column(type="integer")
@@ -25,10 +25,12 @@ class Medico implements UserInterface, \Serializable
      * @ORM\Column(type="string")
      */
     private $cv;
-    /**
-     * unir con usuario
+  	 /**
+     * One Medico solo es un usuario.
+     * @ORM\OneToOne(targetEntity="Usuario")
+     * @ORM\JoinColumn(name="id_usuario", referencedColumnName="id")
      */
-  
+	private $usuario;
 
     public function getNumCol() {
         return $this->num_col;
@@ -53,6 +55,12 @@ class Medico implements UserInterface, \Serializable
     }
     public function setCV($cv) {
         $this->cv = $cv;
+    }
+    public function getUsuario() {
+        return $this->usuario;
+    }
+    public function setsuario($usuario) {
+        $this->usuario = $usuario;
     }
 
 }
