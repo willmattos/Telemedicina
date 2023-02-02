@@ -10,7 +10,6 @@ class Medico
 {
     /**
      * @ORM\Id 
-     * @ORM\GeneratedValue 
      * @ORM\Column(type="integer")
      */
     private $num_col;
