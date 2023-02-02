@@ -3,7 +3,7 @@ medicos ->one/one usuarios
 mensajes ->one/one consulta -> one /one usuario
 consultas ->one/one usuario-> one /one medico //nuevo atributo para cojer mensajes
 valoran ->one/one consulta ->one/one medico -> one/one  usuario
-
+sadas
 
 --------------------------------------------------------------------
 controler
