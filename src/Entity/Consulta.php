@@ -7,13 +7,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity @ORM\Table(name="consultas")
  */
-class Consulta implements UserInterface, \Serializable 
+class Consulta  
 {
 
     /**
      * @ORM\Id 
      * @ORM\GeneratedValue 
-     * @ORM\Column(type="interger")
+     * @ORM\Column(type="integer")
      */
     private $codigo;
     /**
@@ -32,13 +32,24 @@ class Consulta implements UserInterface, \Serializable
      * @ORM\Column(type="integer")
      */
     private $completado;
-    /**
-     * unir paciente
-     * unir medico
-    */
+     /**
+     * One Consulta solo es tiene un usuario.
+     * @ORM\OneToOne(targetEntity="Usuario")
+     * @ORM\JoinColumn(name="id_paciente", referencedColumnName="id")
+     */
+	private $usuario;
+     /**
+     * One Consulta solo es tiene un medico.
+     * @ORM\OneToOne(targetEntity="Medico")
+     * @ORM\JoinColumn(name="num_medico", referencedColumnName="num_col")
+     */
+	private $medico;
 	
     public function getCodigo() {
         return $this->codigo;
+    }
+    public function setCodigo($codigo) {
+        $this->codigo = $codigo;
     }
     public function getAsunto() {
         return $this->asunto;
@@ -46,13 +57,13 @@ class Consulta implements UserInterface, \Serializable
     public function setAsunto($asunto) {
         $this->asunto = $asunto;
     }
-	public function setFecha() {
-        return $this->fecha;
+    public function getFecha() {
+        return $fecha->fecha;
     }
-    public function getFecha($fecha) {
+    public function setFecha($fecha) {
         $this->fecha = $fecha;
     }
- 	public function getLeido() {
+    public function getLeido() {
         return $this->leido;
     }
     public function setLeido($leido) {
@@ -62,7 +73,19 @@ class Consulta implements UserInterface, \Serializable
         return $this->completado;
     }
     public function setCompletado($completado) {
-       $this->completado = $completado;
+        $this->completado = $completado;
+    }
+    public function getUsuario() {
+        return $this->usuario;
+    }
+    public function setUsuario($usuario) {
+        $this->usuario = $usuario;
+    }
+    public function getMedico() {
+        return $this->medico;
+    }
+    public function setMedico($medico) {
+        $this->medico = $medico;
     }
 
 }
