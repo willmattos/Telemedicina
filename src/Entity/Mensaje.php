@@ -7,13 +7,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity @ORM\Table(name="mensajes")
  */
-class Mensaje implements UserInterface, \Serializable 
+class Mensaje
 {
 
     /**
      * @ORM\Id 
      * @ORM\GeneratedValue 
-     * @ORM\Column(type="interger")
+     * @ORM\Column(type="integer")
      */
     private $codigo;
     /**
@@ -29,7 +29,15 @@ class Mensaje implements UserInterface, \Serializable
      */
     private $fecha_hora;
     /**
-     * @ORM\Column(type="integer")
+     * One Consulta solo es tiene un usuario.
+     * @ORM\OneToOne(targetEntity="Consulta")
+     * @ORM\JoinColumn(name="codigo_consulta", referencedColumnName="codigo")
+     */
+    private $codigo_consulta;
+    /**
+     * One Mensaje solo es tiene un usuario.
+     * @ORM\OneToOne(targetEntity="Usuario")
+     * @ORM\JoinColumn(name="id_usuario", referencedColumnName="id")
      */
     private $id_usuario;
 	
@@ -53,6 +61,18 @@ class Mensaje implements UserInterface, \Serializable
     }
     public function setFecha($leido) {
         $this->leido = $leido;
+    }
+    public function getConsulta() {
+        return $this->codigo_consulta;
+    }
+    public function setConsulta($codigo_consulta) {
+        $this->codigo_consulta = $codigo_consulta;
+    }
+    public function getUsuario() {
+        return $this->id_usuario;
+    }
+    public function setUsuario($id_usuario) {
+        $this->id_usuario = $id_usuario;
     }
 
 }
