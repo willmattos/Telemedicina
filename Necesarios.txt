@@ -5,10 +5,6 @@ consultas ->one/one usuario-> one /one medico //nuevo atributo para cojer mensaj
 valoran ->one/one consulta ->one/one medico -> one/one  usuario
 
 
-
-prueba
-
-
 --------------------------------------------------------------------
 controler
 login/loguout
