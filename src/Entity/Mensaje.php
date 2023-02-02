@@ -42,11 +42,11 @@ class Mensaje implements UserInterface, \Serializable
     public function setMensaje($mensaje) {
         $this->mensaje = $mensaje;
     }
-	public function setAdjunto() {
+	public function getAdjunto() {
         return $this->fecha;
     }
-    public function setAdjunto($fecha) {
-        $this->fecha = $fecha;
+    public function setAdjunto($adjunto) {
+        $this->adjunto = $adjunto;
     }
  	public function getFecha() {
         return $this->leido;
