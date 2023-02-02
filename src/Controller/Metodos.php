@@ -21,6 +21,6 @@ class Metodos extends AbstractController{
      * @Route("/bandeja", name="bandeja")
      */
     public function mostrarCategorias() {
-        return new Response("entro");
+        return $this->render('inicio.html.twig');
     }
 }
