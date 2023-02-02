@@ -1,0 +1,30 @@
+{# templates/login.html.twig #}
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Formulario de login</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="estilos.css">
+
+</head>
+<body>
+
+	<form action="{{ path('ctrl_login') }}" method="post">
+		<table>
+			<tr>
+				<td><label for="usuario">Usuario</label></td>
+				<td><input value="" id="username" name="_username" type="text"></td>
+			</tr>
+			<tr>
+				<td><label for="clave">Clave</label></td>
+				<td><input type="password" id="password" name="_password"></td>
+			</tr>
+		</table>
+		<input type="submit">
+	</form>
+	<a href="aa">Recuperar Contraseña</a><br>
+	<a href="aa">Registrarse</a>
+</body>
+
+</html>
