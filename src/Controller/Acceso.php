@@ -1,24 +1,26 @@
 <?php
-function a(){
+// src/Controller/Acceso.php
+namespace App\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Entity\Medico;
+use App\Entity\Usuario;
+use App\Entity\Consulta;
+use App\Entity\Mensaje;
+use App\Entity\Valoran;
 
-    echo "tamos ready";
-          echo "tamos ready";
-          echo "tamos ready";
-          echo "tamos ready";
-          echo "tamos ready";
-          echo "tamos ready";
-
-}
-function asdadc(){
- //nadad  
- 
-}
-
-function pruue(){
-
-    echo "cambbiaa";
-}
-function asdadsadac(){
- //nadad  
- 
+class Acceso extends AbstractController{
+    /**
+     * @Route("/login", name="login")
+     */
+    public function login(){
+        $entityManager = $this->getDoctrine()->getManager();
+        $equipo = $entityManager->find(Mensaje::class, 15);
+        //var_dump($equipo);
+        return new Response($equipo->getUsuario()->getNombre());
+    }
 }
