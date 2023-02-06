@@ -14,7 +14,9 @@ class Medico
      */
     private $num_col;
     /**
-     * @ORM\Column(type="string")
+     * One Especialidad solo es un usuario.
+     * @ORM\OneToOne(targetEntity="Especialidades")
+     * @ORM\JoinColumn(name="especialidad", referencedColumnName="codigo")
      */
     private $especialidad;
     /**
