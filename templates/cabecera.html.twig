@@ -1,12 +1,44 @@
-<h1><a href="{{ path('bandeja') }}">Telemedicina</a></h1>
-<nav>
-    <ul>
-        <li><a href="bandeja.php" class="nav">Bandeja</a></li>
-        <li><a href="lista_medicos.php" class="nav">Medicos</a></li>
-        {% if is_granted('ROLE_ADMIN') %}
-			<li><a href='zonaadmin.php' class='nav'>Zona Admin</a></li>
-		{%endif%}
-        <li><a href="perfil.php" class="nav">Perfil</a></li>
-        <li><a href="logout.php" class="nav">Salir</a></li>
-    </ul>
-</nav>
+<div class="header">
+        <div>
+          TELEMEDICINA<a href="{{ path('bandeja') }}">
+            <span class="link"></span>
+          </a>
+        </div>
+</div>
+      <div class="nav">
+        <ul>
+            {% if is_granted('ROLE_USER') %}
+			
+           <li>
+            Bandeja
+            <a href="{{ path('bandeja') }}">
+              <span class="link"></span>
+            </a>
+          </li>
+		    
+            {%endif%}
+            {% if is_granted('ROLE_ADMIN') %}
+			
+            <li>
+            Zona Admin
+            <a href="admin.html">
+              <span class="link"></span>
+            </a>
+          </li>
+		    
+            {%endif%}
+
+          <li>
+            Medicos
+            <a href="{{ path('medicos') }}">
+              <span class="link"></span>
+            </a>
+          </li>
+          <li>
+            Perfil
+            <a href="perfil.html">
+              <span class="link"></span>
+            </a>
+          </li>
+        </ul>
+      </div>
