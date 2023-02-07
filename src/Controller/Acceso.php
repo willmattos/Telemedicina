@@ -1,4 +1,3 @@
-<?php
 // src/Controller/Acceso.php
 namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,14 +12,20 @@ use App\Entity\Consulta;
 use App\Entity\Mensaje;
 use App\Entity\Valoran;
 
+
 class Acceso extends AbstractController{
     /**
-     * @Route("/login", name="login")
+     * @Route("/login", name="ctrl_login")
      */
-    public function login(){
-        $entityManager = $this->getDoctrine()->getManager();
-        $equipo = $entityManager->find(Mensaje::class, 15);
-        //var_dump($equipo);
-        return new Response($equipo->getUsuario()->getNombre());
-    }
+    public function login(){    
+        return $this->render('login.html.twig');
+    }    
+	
+	/**
+     * @Route("/logout", name="ctrl_logout")
+     */
+    public function logout(){    
+        return $this->render('login.html.twig');
+    }    
 }
+

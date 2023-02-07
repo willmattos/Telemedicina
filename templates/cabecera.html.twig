@@ -1,0 +1,44 @@
+<div class="header">
+        <div>
+          TELEMEDICINA<a href="{{ path('bandeja') }}">
+            <span class="link"></span>
+          </a>
+        </div>
+</div>
+      <div class="nav">
+        <ul>
+            {% if is_granted('ROLE_USER') %}
+			
+           <li>
+            Bandeja
+            <a href="{{ path('bandeja') }}">
+              <span class="link"></span>
+            </a>
+          </li>
+		    
+            {%endif%}
+            {% if is_granted('ROLE_ADMIN') %}
+			
+            <li>
+            Zona Admin
+            <a href="admin.html">
+              <span class="link"></span>
+            </a>
+          </li>
+		    
+            {%endif%}
+
+          <li>
+            Medicos
+            <a href="{{ path('medicos') }}">
+              <span class="link"></span>
+            </a>
+          </li>
+          <li>
+            Perfil
+            <a href="perfil.html">
+              <span class="link"></span>
+            </a>
+          </li>
+        </ul>
+      </div>

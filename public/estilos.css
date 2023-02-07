@@ -1,0 +1,299 @@
+html,
+body {
+  margin: 0px;
+  height: 100vh;
+}
+.todo {
+  height: 100%;
+}
+.conten {
+  height: 90%;
+  font-size: 2vh;
+}
+.header {
+  transition: 500ms linear;
+  background-color: #fff;
+  padding: 1ex 0ex 1ex 1ex;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  font-size: 3.5vh;
+}
+.header:hover, .header>div:hover{
+  transition: 500ms linear;
+    background-color: #008296;
+    color: #fff;
+  font-size: 2.2rem;
+  padding: auto;
+}
+.header a:link,
+.header a:visited,
+.header a:active {
+  color: black;
+  text-decoration: none;
+}
+.nav,
+.nav ul {
+  background-color: rgb(80, 200, 130);
+  padding: 0px;
+  margin: 0px;
+  text-align: center;
+  font-size: 2vh;
+}
+.nav li {
+  transition: 300ms linear;
+  background-color: rgb(80, 200, 130);
+  border-radius: 0em;
+  box-sizing: border-box;
+  padding: 10px 25px;
+  display: inline-block;
+  min-width: 153px;
+  cursor: pointer;
+  position: relative;
+}
+.nav li:hover {
+    border-radius: 1em;
+  background-color: rgb(42, 105, 68);
+  color: #d5d9d9;
+  transition: 300ms linear;
+}
+.contenedor_consultas{
+  box-sizing: border-box;
+  width: 30%;
+  height: 97%;
+  float: left;
+  overflow-y: scroll;
+}
+.contenedor_consultas div {
+  margin: 1ex;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 1ex;
+  cursor: pointer;
+  position: relative;
+}
+.contenedor_consultas div:hover {
+  background: rgb(106, 103, 109);
+  color: #d5d9d9;
+  transition: 500ms linear;
+}
+.link {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.consulta, .nueva_consulta {
+  box-sizing: border-box;
+  width: 70%;
+  height: 97%;
+  float: left;
+  overflow-y: scroll;
+}
+.datos_consulta {
+  height: 20%;
+}
+.datos_consulta p {
+  display: inline-block;
+  font-weight: bold;
+  font-size: x-large;
+}
+.datos_consulta span {
+  float: right;
+}
+.consulta_foto{
+  width: 10vh;
+    height: 10vh;
+    border-radius: 2em;
+}
+.datos_consulta > * {
+  margin: 1ex;
+}
+/* CSS */
+.button-24 {
+  background: #ff4742;
+  border: 1px solid #ff4742;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
+  box-sizing: border-box;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: nunito, roboto, proxima-nova, "proxima nova", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 16px;
+  min-height: 40px;
+  outline: 0;
+  padding: 12px 14px;
+  text-align: center;
+  text-rendering: geometricprecision;
+  text-transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+}
+
+.button-24:hover,
+.button-24:active {
+  background-color: initial;
+  background-position: 0 0;
+  color: #ff4742;
+}
+
+.button-24:active {
+  opacity: 0.5;
+}
+#button-25{
+  background-color: #0a6bff;
+border: 1px solid #0a6bff;
+}
+#button-25:hover,
+#button-25:active {
+  background-color: initial;
+  background-position: 0 0;
+  color: #0a6bff;
+}
+#button-25:active {
+  opacity: 0.5;
+}
+.contenedor_mensajes {
+  overflow-y: scroll;
+  height: 60%;
+  margin: 1ex;
+}
+.envio_mensaje {
+  margin: 1ex;
+  text-align: right;
+  float: right;
+  width: 50%;
+  padding-top: 1ex;
+  height: 15%;
+}
+.mensaje , #mensaje{
+  width: 97%;
+  outline: none;
+  resize: none;
+  border-radius: 10px;
+}
+/* CSS */
+.button-13 {
+  background-color: #fff;
+  border: 1px solid #d5d9d9;
+  border-radius: 8px;
+  box-shadow: rgba(213, 217, 217, 0.5) 0 2px 5px 0;
+  box-sizing: border-box;
+  color: #0f1111;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Amazon Ember", sans-serif;
+  font-size: 13px;
+  line-height: 29px;
+  padding: 0 10px 0 11px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  width: 100px;
+}
+
+.button-13:hover {
+  background-color: #f7fafa;
+}
+
+.button-13:focus {
+  border-color: #008296;
+  box-shadow: rgba(213, 217, 217, 0.5) 0 2px 5px 0;
+  outline: 0;
+}
+h1 a:link,
+h1 a:visited,
+h1 a:active,
+.nav a:link,
+.nav a:visited,
+.nav a:active,
+.contenedor_consultas a:link,
+.contenedor_consultas a:visited,
+.contenedor_consultas a:active {
+  text-decoration: none;
+  color: black;
+}
+
+.izq p {
+  max-width: 50%;
+  margin-left: 0px;
+  float: left;
+  padding: 5px;
+  border-radius: 8px;
+  background-color: rgb(126, 154, 171);
+  color: white;
+}
+.der p {
+  max-width: 50%;
+  margin-right: 0px;
+  float: right;
+  padding: 5px;
+  border-radius: 8px;
+  background-color: rgb(28, 137, 205);
+  color: white;
+}
+.leido p{
+    margin-right: 0px;
+    float: right;
+    position: relative;
+    bottom: 15px;
+    color: rgb(156, 158, 157);
+}
+.medicos{
+  height: 95%;
+  overflow-y: scroll;
+}
+.categorias{
+  text-align: center;
+  padding: 1em;
+}
+.medicos table {
+  width: 100%;
+}
+.medicos td {
+  width: 25%;
+  text-align: center;
+}
+.perfil{
+  text-align: center;
+  margin: 1vh auto;
+  border: 1px solid;
+  width: 50%;
+}
+.perfil .consulta_foto{
+  width: 30vh;
+  height: auto;
+  border-radius: 10vh;
+}
+.nueva_consulta th {
+  font-size: 2em;
+  padding: 1ex;
+}
+.nueva_consulta table td {
+  margin-bottom: 50px;
+  width: 20em;
+}
+.login {
+  margin: 0 auto;
+  width: 50%;
+  height: 100%;
+  text-align: center;
+}
+.login table,.login td {
+  margin: 20% auto;
+  padding: 1ex;
+  max-width: 50%;
+}
