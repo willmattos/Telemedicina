@@ -20,11 +20,11 @@ class Metodos extends AbstractController{
     /**
      * @Route("/bandeja", name="bandeja")
      */
-    public function badneja() {
+    public function bandeja() {
         return $this->render('bandeja.html.twig');
     }
         /**
-     * @Route("/bandeja/nueva_consulta", name="bandeja")
+     * @Route("/bandeja/nueva_consulta", name="nueva consulta")
      */
     public function mostrarCategorias() {
         return $this->render('bandeja.html.twig');
