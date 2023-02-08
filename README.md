@@ -52,3 +52,32 @@ perfil
 salir
 recuperar
 registrarse
+---------------------------------
+Notas Ivan
+        /**
+     * @Route("/bandeja/nueva_consulta", name="bandeja")
+     */
+    public function crearConsulta() {
+        if(isset($_POST['asunto'] ) || isset($_POST['mensaje']) || isset($_POST['adjunto']) || isset($_POST['medicos'])){
+            foreach($_POST['medicos'] as $medico){
+                $entityManager = $this->getDoctrine()->getManager();
+                $consulta = new Consulta();
+                $consulta->setAsunto($_POST['asunto']);
+                $consulta->setLeido(0);
+                $consulta->setCompletado(0);
+                $consulta->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
+                $consulta->setMedico($entityManager->find(Medico::class,$_POST['medicos']));
+                $entityManager->persist($consulta);
+                $entityManager->flush();
+                $mensaje = new Mensaje();
+                $mensaje->setMensaje($_POST['mensaje']);
+                $mensaje->setAdjunto($_POST['adjunto']);
+                $mensaje->setConsulta($entityManager->find(Consulta::class,$consulta->getCodigo()));
+                $mensaje->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
+                $entityManager->persist($mensaje);
+                $entityManager->flush();
+            }
+        }
+         return new Response("Equipo insertado, Id= " . $nuevo->getId() . "\n");
+        //return $this->render('bandeja.html.twig');
+    }
