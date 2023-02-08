@@ -24,16 +24,21 @@ class Metodos extends AbstractController{
         return $this->render('bandeja.html.twig');
     }
         /**
-     * @Route("/bandeja/nueva_consulta", name="nueva consulta")
+     * @Route("/bandeja/crearconsulta", name="formularioConsulta")
      */
-    public function mostrarCategorias() {
-        return $this->render('bandeja.html.twig');
+    public function formularioConsulta() {
+        return $this->render('formularioConsulta.html.twig');
     }
-        /**
-     * @Route("/medicos", name="medicos")
+            /**
+     * @Route("/bandeja/crear_consulta", name="crear_consulta")
      */
-    public function mostrarMedicos() {
-        return $this->render('bandeja.html.twig');
+    public function formularioCoansulta() {
+        return $this->render('consulta.html.twig');
     }
-
+                /**
+     * @Route("/bandeja/crear_consulta", name="medicos")
+     */
+    public function formularioCoaasdnsulta() {
+        return $this->render('consulta.html.twig');
+    }
 }
