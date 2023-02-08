@@ -38,8 +38,8 @@ class Usuario implements UserInterface, \Serializable
     /**
      * @ORM\Column(type="integer", name = "bloquear")
      */
-    private $bloquear;	
-	
+    private $bloquear;
+
     /**
      * @return mixed
      */
