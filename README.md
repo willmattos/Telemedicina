@@ -52,3 +52,6 @@ perfil
 salir
 recuperar
 registrarse
+
+//post
+asunto,mensaje,adjunto,
