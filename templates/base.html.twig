@@ -3,18 +3,18 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Aplicación de pedidos{% endblock %}</title>
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="estilos.css">
     </head>
     <body>
 		{% block body %}
-        <header>
-			{% block header %}
+        <div class="todo">
+			{% block cabecera %}
 				{{ include('cabecera.html.twig') }}
-				<hr>
 			{%endblock %}
-        </header>
-		{% block contenido%}
-		{% endblock%}        
+		    {% block contenido%}
+		    {% endblock%} 
+        </div>   
         {% endblock %}
     </body>
 </html>

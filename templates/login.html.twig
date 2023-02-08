@@ -1,30 +1,33 @@
 {# templates/login.html.twig #}
-<!DOCTYPE html>
-<html>
-
-<head>
-	<title>Formulario de login</title>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="estilos.css">
-
-</head>
-<body>
-	<h1><a href="{{ path('ctrl_login') }}">Telemedicina</a></h1>
-	<form action="{{ path('ctrl_login') }}" method="post">
-		<table>
-			<tr>
-				<td><label for="usuario">Usuario</label></td>
-				<td><input value="" id="username" name="_username" type="text"></td>
-			</tr>
-			<tr>
-				<td><label for="clave">Clave</label></td>
-				<td><input type="password" id="password" name="_password"></td>
-			</tr>
-		</table>
-		<input type="submit">
-	</form>
-	<a href="aa">Recuperar Contraseña</a><br>
-	<a href="aa">Registrarse</a>
-</body>
-
-</html>
+{% extends 'base.html.twig' %}
+{% block contenido %}  
+      <div class="conten">
+        <div class="login">
+		<form action="{{ path('ctrl_login') }}" method="post">
+          <table>
+            <tr>
+              <td><label for="">Usuario</label></td>
+              <td><input type="text" id="username" name="_username" /></td>
+            </tr>
+            <tr>
+              <td><label for="">Contraseña</label></td>
+              <td><input type="password" id="password" name="_password"/></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button id="button-25" class="button-24" role="button" type="submit">
+                  Iniciar
+                </button>
+              </td>
+            </tr>
+            <tr>
+                <td colspan="2"><a href="recuperar.html">Recuperar Contraseña</a></td>
+            </tr>
+            <tr>
+                <td colspan="2"><a href="registro.html">Registrarse</a></td>
+            </tr>
+          </table>
+		  </form>
+        </div>
+      </div>
+{% endblock %}

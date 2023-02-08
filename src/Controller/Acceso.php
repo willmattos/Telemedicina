@@ -19,6 +19,6 @@ class Acceso extends AbstractController{
      * @Route("/logout", name="ctrl_logout")
      */
     public function logout(){    
-        return new Response("saliste");
+        return $this->render('login.html.twig');
     }    
 }
