@@ -9,7 +9,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class Consulta  
 {
-
     /**
      * @ORM\Id 
      * @ORM\GeneratedValue 
@@ -20,7 +19,7 @@ class Consulta
      * @ORM\Column(type="string")
      */
     private $asunto;
-        /**
+    /**
      * @ORM\Column(type="datetimetz")
      */
     private $fecha;
