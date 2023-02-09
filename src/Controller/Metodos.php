@@ -87,4 +87,12 @@ class Metodos extends AbstractController{
         //return $this->render('chat.html.twig');
         }
     }
+    /**
+     * @Route("/perfil", name="perfil")
+     */
+    public function cargarPerfil() {
+        
+        return $this->render('perfil.html.twig');
+        
+    }
 }

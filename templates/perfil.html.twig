@@ -1,0 +1,21 @@
+{# templates/bandeja.html.twig #}
+{% extends 'base.html.twig' %}
+{% block contenido %}
+<div class="conten">
+  <div class="contenedor_consultas" id="">
+    <div>
+      Nueva Consulta
+      <a href="{{ path('formularioConsulta')}}">
+        <span class="link"></span>
+      </a>
+    </div>
+  </div>
+  <div class="consulta">
+    {% block consulta %}
+
+    {% endblock %}
+
+    <H1>JKAHSFGJASFNGA</H1>
+  </div>
+</div>
+{% endblock %}
