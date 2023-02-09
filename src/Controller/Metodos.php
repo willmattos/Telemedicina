@@ -23,6 +23,12 @@ use App\Entity\Valoran;
 
 
 class Metodos extends AbstractController{
+        /**
+     * @Route("/medicos", name="medicos")
+     */
+    public function mostrarMedicos() {
+        return $this->render('bandeja.html.twig');
+    }
     /**
      * @Route("/bandeja", name="bandeja")
      */
