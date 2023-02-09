@@ -1,60 +1,60 @@
 {# templates/formularioConsulta.html.twig #}
 {% extends 'bandeja.html.twig' %}
 {% block consulta %}
-    <form action="{{ path('crear_consulta') }}" method="post"></form>
-    <table>
-      <tr>
-        <th colspan="2">Nueva Consulta</th>
-      </tr>
-      <tr>
-        <td><label for="asunto">Asunto</label></td>
+    <form action="{{ path('crear_consulta') }}" method="post">
+      <table>
+        <tr>
+          <th colspan="2">Nueva Consulta</th>
+        </tr>
+        <tr>
+          <td><label for="asunto">Asunto</label></td>
+          <td>
+            <input type="text" id="asunto" name="asunto" maxlength="20" require />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="mensaje">Mensaje</label>
+          </td>
+          <td>
+            <textarea maxlength="255" name="mensaje" id="mensaje" cols="30" rows="10" require></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td><label for="adjuntar">Adjuntar</label></td>
+          <td><input type="file" name="adjunto" /></td>
+        </tr>
+        <tr>
+          <td><label for="especialidad">Especialidad</label></td>
+          <td>
+            <select name="especialidad" id="especialidad">
+              <option value="" selected>--</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+      <table id="medicos">
+        <tr>
+          <td>
+            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
+          </td>
+          <td>
+            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
+          </td>
+          <td>
+            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
+          </td>
+        </tr>
+        <td><button class="button-24" role="button" type="reset">Borrar</button></td>
         <td>
-          <input type="text" id="asunto" name="asunto" maxlength="20" require />
+          <button type="submit" id="button-25" class="button-24" role="button" >Crear</button>
         </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="mensaje">Mensaje</label>
-        </td>
-        <td>
-          <textarea maxlength="255" name="mensaje" id="mensaje" cols="30" rows="10" require></textarea>
-        </td>
-      </tr>
-      <tr>
-        <td><label for="adjuntar">Adjuntar</label></td>
-        <td><input type="file" name="adjunto" /></td>
-      </tr>
-      <tr>
-        <td><label for="especialidad">Especialidad</label></td>
-        <td>
-          <select name="especialidad" id="especialidad">
-            <option value="" selected>--</option>
-          </select>
-        </td>
-      </tr>
-    </table>
-    <table id="medicos">
-      <tr>
-        <td>
-          <input type="checkbox" name="medicos[]" value="" />Juan Perez
-        </td>
-        <td>
-          <input type="checkbox" name="medicos[]" value="" />Juan Perez
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <input type="checkbox" name="medicos[]" value="" />Juan Perez
-        </td>
-        <td>
-          <input type="checkbox" name="medicos[]" value="" />Juan Perez
-        </td>
-      </tr>
-      <td><button class="button-24" role="button" type="reset">Borrar</button></td>
-      <td>
-        <button id="button-25" class="button-24" role="button" type="submit">Crear</button>
-      </td>
-      </tr>
-    </table>
+        </tr>
+      </table>
     </form>
     {% endblock %}

@@ -36,7 +36,7 @@ class Metodos extends AbstractController{
         return $this->render('bandeja.html.twig');
     }
     /**
-     * @Route("/bandeja", name="formularioConsulta")
+     * @Route("/formularioConsulta", name="formularioConsulta")
      */
     public function mostrarFormulario() {
         return $this->render('formularioConsulta.html.twig');
@@ -79,17 +79,5 @@ class Metodos extends AbstractController{
         if(isset($_POST['asunto'] ) || isset($_POST['mensaje'])){
         //return $this->render('chat.html.twig');
         }
-    }
-            /**
-     * @Route("/bandeja/crear_consulta", name="crear_consulta")
-     */
-    public function formularioCoansulta() {
-        return $this->render('consulta.html.twig');
-    }
-                /**
-     * @Route("/bandeja/crear_consulta", name="medicos")
-     */
-    public function formularioCoaasdnsulta() {
-        return $this->render('consulta.html.twig');
     }
 }
