@@ -5,22 +5,22 @@
         <div class="contenedor_consultas" id="">
           <div>
             Nueva Consulta
-            <a href="{{ path('bandeja','nueva_consulta') }}">
+            <a href="{{ path('bandeja') }}">
               <span class="link"></span>
             </a>
           </div>
           {% if consultas is defined %}
-          {% for consulta in consultas %}
-          <div>
-              <dl>
-                <dt>Medico:Consulta 1</dt>
-                <dd>principio de ultimo mensaje</dd>
-              </dl>
-              <a href="">
-                <span class="link"></span>
-              </a>
-            </div>
-          {% endfor %}
+            {% for consulta in consultas %}
+            <div>
+                <dl>
+                  <dt>Medico:Consulta 1</dt>
+                  <dd>principio de ultimo mensaje</dd>
+                </dl>
+                <a href="">
+                  <span class="link"></span>
+                </a>
+              </div>
+            {% endfor %}
           {% endif %}
         </div>
         <div class="consulta">
@@ -92,6 +92,7 @@
             </form>
           </div>
           {% endif %}
+        
       <script>
         var objDiv = document.getElementById("contenedor_mensajes");
         objDiv.scrollTop = objDiv.scrollHeight;

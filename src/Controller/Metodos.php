@@ -29,8 +29,9 @@ class Metodos extends AbstractController{
     public function bandeja() {
         return $this->render('bandeja.html.twig');
     }
-    /**
-     * @Route("/bandeja/nueva_consulta", name="bandeja")
+
+        /**
+     * @Route("/bandeja/nueva_consulta", name="nueva consulta")
      */
     public function crearConsulta() {
         if(isset($_POST['asunto'] ) || isset($_POST['mensaje']) || isset($_POST['adjunto']) || isset($_POST['medicos'])){
