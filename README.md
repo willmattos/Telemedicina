@@ -87,3 +87,8 @@ Notas Ivan
         //return $this->render('bandeja.html.twig');
     }
 
+
+    nombre de medico
+    asunto 
+    codigo de consulta
+
