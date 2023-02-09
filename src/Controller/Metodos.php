@@ -33,7 +33,15 @@ class Metodos extends AbstractController{
      * @Route("/bandeja", name="bandeja")
      */
     public function bandeja() {
-        return $this->render('bandeja.html.twig');
+        $datos = array();
+        $id = $this->getUser()->getId();
+        $entityManager = $this->getDoctrine()->getManager();
+        $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>$id));
+        for($i = 0;$i<count($consultas);$i++){
+            array_push($datos, array($consultas[$i]->getCodigo(),$consultas[$i]->getAsunto(),$consultas[$i]->getMedico()->getUsuario()->getNombre()));
+        }
+        var_dump($datos);
+        return $this->render('bandeja.html.twig', array('consultas' =>$datos));
     }
     /**
      * @Route("/formularioConsulta", name="formularioConsulta")
@@ -48,14 +56,14 @@ class Metodos extends AbstractController{
         if(isset($_POST['asunto'] ) || isset($_POST['mensaje']) || isset($_POST['adjunto']) || isset($_POST['medicos'])){
             foreach($_POST['medicos'] as $medico){
                 $entityManager = $this->getDoctrine()->getManager();
-                
+               
                 //Creamos la consulta
                 $consulta = new Consulta();
                 $consulta->setAsunto($_POST['asunto']);
                 $consulta->setLeido(0);
                 $consulta->setCompletado(0);
                 $consulta->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
-                $consulta->setMedico($entityManager->find(Medico::class,$_POST['medicos']));
+                $consulta->setMedico($entityManager->find(Medico::class,$_POST['medicos'][0]));
                 $entityManager->persist($consulta);
                 $entityManager->flush();
                 
@@ -69,8 +77,7 @@ class Metodos extends AbstractController{
                 $entityManager->flush();
             }
         }
-         return new Response("Equipo insertado\n");
-        //return $this->render('bandeja.html.twig');
+        return $this->render('bandeja.html.twig');
     }
     /**
      * @Route("/bandeja/{num}", name="chat")
