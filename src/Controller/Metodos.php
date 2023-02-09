@@ -58,7 +58,7 @@ class Metodos extends AbstractController{
                 $entityManager->flush();
             }
         }
-         return new Response("Equipo insertado, Id= " . $nuevo->getId() . "\n");
+         return new Response("Equipo insertado\n");
         //return $this->render('bandeja.html.twig');
     }
     /**
