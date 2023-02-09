@@ -9,6 +9,19 @@
         <span class="link"></span>
       </a>
     </div>
+    {% for consulta in consultas %}
+    <div>
+      <dl>
+        <dt>{{consulta.2}}:{{consulta.1}}</dt>
+        <dd>principio de ultimo mensaje</dd>
+      </dl>
+      <a href="{{ path('chat',)}}">
+        <span class="link"></span>
+      </a>
+    </div>
+  
+    {% endfor %}
+
   </div>
   <div class="consulta">
     {% block consulta %}
