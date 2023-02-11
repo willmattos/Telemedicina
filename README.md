@@ -1,5 +1,7 @@
 # Telemedicina-Symfony
- 
+ composer update
+ composer recipes:install symfony/apache-pack --force -v;
+
 Al empezar
 en la carpeta a modificar git bash here;
 -----------

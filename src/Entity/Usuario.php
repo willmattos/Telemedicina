@@ -19,15 +19,19 @@ class Usuario implements UserInterface, \Serializable
      * @ORM\Column(type="string", name = "correo")
      */
     private $correo;
-        /**
+    /**
      * @ORM\Column(type="string", name = "nombre")
      */
     private $nombre;
+    /**
+     * @ORM\Column(type="string", name = "apellido")
+     */
+    private $apellido;
         /**
      * @ORM\Column(type="string", name = "clave")
      */
     private $clave;
-        /**
+    /**
      * @ORM\Column(type="integer", name = "rol")
      */
     private $rol;
@@ -67,6 +71,12 @@ class Usuario implements UserInterface, \Serializable
     }
 	public function getNombre() {
         return $this->nombre;
+    }
+    public function setApellido($apellido) {
+        $this->apellido = $apellido;
+    }
+	public function getApellido() {
+        return $this->apellido;
     }
     public function setClave($clave) {
         $this->clave = $clave;
@@ -122,6 +132,7 @@ class Usuario implements UserInterface, \Serializable
             $this->id,
             $this->correo,
             $this->nombre,
+            $this->apellido,
             $this->clave,
             $this->rol,
             $this->foto,
@@ -134,6 +145,7 @@ class Usuario implements UserInterface, \Serializable
             $this->id,
             $this->correo,
             $this->nombre,
+            $this->apellido,
             $this->clave,
             $this->rol,
             $this->foto,
