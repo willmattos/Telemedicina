@@ -47,7 +47,7 @@ class Medico
         $this->especialidad = $especialidad;
     }
 	public function getHospital() {
-        return $this->supervisor;
+        return $this->hospital;
     }
     public function setHospital($hospital) {
         $this->hospital = $hospital;

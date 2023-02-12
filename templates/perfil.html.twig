@@ -1,21 +1,229 @@
 {# templates/bandeja.html.twig #}
 {% extends 'base.html.twig' %}
+{% block js %}
+<script>
+
+  let datos;
+
+  let dat;
+
+  $(document).ready(function () {
+    datos = parseInt(document.getElementById('datos').innerText);  
+    
+    document.getElementById('consulta_foto').parentNode.setAttribute('rowspan',datos-1)
+    
+    $('#button-26').click(modoEditar)
+  });
+  function modoEditar() {
+    let label = ['Nombre:','Apellidos:','Correo:'];
+    let labelname =  ['nombre','apellido','correo'];
+
+    foto = document.getElementById('consulta_foto').getAttribute('src')
+    NomyApe = $('.nombre').text().split(' ');
+    correo = $('.correo').text()
+
+    dat = [NomyApe[0],NomyApe[1],correo]
+    if(datos == 7){
+    labelname.push('colegiado','hospital','especialidad','cv')
+    label.push('Colegiado:','Hospital:','Especialidad:','Curriculum:')
+    let colegiado = $('.colegiado').text()
+    let hospital = $('.hospital').text()
+    let especialidad = $('.especialidades').html()
+    let cv = $('#cv').html();
+    dat.push(colegiado,hospital,especialidad,cv)
+    }
+
+    $('.perfil').html('')
+
+    for(i=0;i<label.length;i++){
+      let tr = document.createElement('tr');
+      let td1 = document.createElement('td')
+      let td2 = document.createElement('td')
+      let input = document.createElement('input')
+      if(!i){
+        let tdimg = document.createElement('td')
+        let img = document.createElement('img')
+        tr.appendChild(tdimg)
+        tdimg.appendChild(img)
+        tdimg.setAttribute('rowspan',datos)
+        img.setAttribute('class','consulta_foto')
+        img.setAttribute('id','consulta_foto')
+        img.setAttribute('src',foto)
+        img.setAttribute('alt','foto perfil')
+      }
+    
+      tr.appendChild(td1)
+      tr.appendChild(td2)
+      td1.appendChild(document.createTextNode(label[i]))
+      td2.appendChild(input)
+      if(i==5){
+        input.outerHTML =dat[i];
+      }else if(i==6){
+        input.setAttribute('type','file')
+        input.setAttribute('name',labelname[i])
+      }else{
+        input.setAttribute('type','text')
+        input.setAttribute('value',dat[i])
+        input.setAttribute('name',labelname[i])
+      }
+      if(i==2 || i==3){
+        input.setAttribute('disabled',true)
+      }
+      $('.perfil').append(tr)
+    }
+    let trfoto = document.createElement('tr')
+    let tdfoto = document.createElement('td')
+    let inputfoto = document.createElement('input')
+    
+    trfoto.appendChild(tdfoto)
+    tdfoto.appendChild(inputfoto)
+    
+    inputfoto.setAttribute('type','file')
+    inputfoto.setAttribute('name','foto')
+
+    $('.perfil').append(trfoto)
+    if(datos == 7){
+      document.getElementById('especialidad').removeAttribute('disabled')
+    }
+
+    $(".actualizar").html("")
+    let button1 = document.createElement('button')
+    let button2 = document.createElement('button')
+    $(".actualizar").append(button1, button2)
+    button1.appendChild(document.createTextNode('Cancelar'))
+    button1.addEventListener('click', modoVista)
+    button1.setAttribute('class', 'button-24')
+    button1.setAttribute('role', 'button')
+    button2.appendChild(document.createTextNode('Confirmar'))
+    button2.setAttribute('type', 'submit')
+    button2.setAttribute('class', 'button-24')
+    button2.setAttribute('id', 'button-25')
+  }
+  function modoVista() {
+
+    let imagen = $('td[rowspan]').html()
+    let label = ['Nombre y Apellidos:','Correo:'];
+    let labelname =  ['nombre','correo'];
+    if(datos == 7){
+    label.push('Colegiado:','Hospital:','Especialidad:','Curriculum:')
+    labelname.push('colegiado','hospital','especialidad')
+    }
+
+    $('.perfil').html('')
+    let tbody = document.createElement('tbody')
+    $('.perfil').append(tbody)
+
+
+    for(i=0;i<label.length;i++){
+      let tr = document.createElement('tr');
+      let td1 = document.createElement('td')
+      let td2 = document.createElement('td') 
+      if(!i){
+        let tdimg = document.createElement('td')
+        tdimg.innerHTML = imagen
+        tdimg.setAttribute('rowspan',datos-1)
+        let nya = document.createElement('td')
+        let nya1 = document.createElement('td')
+        nya1.setAttribute('class',labelname[i])
+        tr.appendChild(tdimg)
+        tr.appendChild(nya)
+        tr.appendChild(nya1)
+        nya.appendChild(document.createTextNode(label[i]))
+        nya1.appendChild(document.createTextNode(dat[i]+" "+dat[i+1]))
+        $('.perfil').append(tr)
+        continue;
+      }
+    
+      tr.appendChild(td1)
+      tr.appendChild(td2)
+      td2.setAttribute('class',labelname[i])
+      td1.appendChild(document.createTextNode(label[i]))
+      if(i+1==5){
+        td2.innerHTML +=dat[i+1]
+       //input.outerHTML =+"";
+      }else if(i+1>5){
+        td2.innerHTML +=dat[i+1]
+        td2.removeAttribute('class')
+        td2.setAttribute('id','cv')
+      }else{
+        td2.append(document.createTextNode(dat[i+1]))
+      }
+     
+      tbody.appendChild(tr)
+    }
+    if(datos == 7){
+      document.getElementById('especialidad').parentNode.setAttribute('class','especialidades')
+    }
+
+    $(".actualizar").html("")
+    let button1 = document.createElement('button')
+    button1.setAttribute('class', 'button-24')
+    button1.setAttribute('id', 'button-26')
+
+    $(".actualizar").append(button1)
+    button1.appendChild(document.createTextNode('Actualizar'))
+    button1.addEventListener('click', modoEditar)
+  }
+  
+</script>
+
+{% endblock %}
 {% block contenido %}
 <div class="conten">
-  <div class="contenedor_consultas" id="">
-    <div>
-      Nueva Consulta
-      <a href="{{ path('formularioConsulta')}}">
-        <span class="link"></span>
-      </a>
+  <form action="" method="post">
+    <table class="perfil">
+      <tr>
+        <td>
+          {% if usuario is null %}
+          <img id="consulta_foto" class="consulta_foto" src="{{ asset('default/foto.png')}}" alt="foto perfil" />
+          {% else %}
+          <img id="consulta_foto" class="consulta_foto" src="data:image/png;base64,{{usuario.foto}}" alt="foto perfil" />
+          {% endif %}
+        </td>
+        <td>Nombre y Apellidos:</td>
+        <td class="nombre">{{app.user.getNombre()}} {{app.user.getApellido()}}</td>
+      </tr>
+      <tr>
+        <td>Correo:</td>
+        <td class="correo">{{app.user.getCorreo()}}</td>
+      </tr>
+      {% if medico is  null %}
+      <span id="datos" style="display: none;">3</span>
+      {% else %}
+      <span id="datos" style="display: none;">7</span>
+      <tr>
+        <td>Colegiado:</td>
+        <td class="colegiado">{{medico.getNumCol()}}</td>
+      </tr>
+      <tr>
+        <td>Hospital:</td>
+        <td class="hospital">{{medico.getHospital()}}</td>
+      </tr>
+      <tr>
+        <td>Especialidad:</td>
+        <td class="especialidades">
+          <select name="especialidad" id="especialidad" disabled>
+            {% for esp in especialidades %}
+                {% if esp.nombre == medico.getEspecialidad().getNombre() %}
+                <option value="{{ esp.codigo }}" selected>{{ esp.nombre }}</option>
+                {% else %}
+                <option value="{{ esp.codigo }}">{{ esp.nombre }}</option>
+                {% endif %}
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Curriculum:</td>
+        <td id="cv">
+          <a href="">{{medico.getCV()}}</a>
+        </td>
+      </tr>
+      {% endif %}
+    </table>
+    <div class="actualizar">
+      <button class="button-24" id="button-26">Actualizar</button>
     </div>
-  </div>
-  <div class="consulta">
-    {% block consulta %}
-
-    {% endblock %}
-
-    <H1>JKAHSFGJASFNGA</H1>
-  </div>
+  </form>
 </div>
 {% endblock %}

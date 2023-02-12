@@ -1,60 +1,103 @@
-{# templates/formularioConsulta.html.twig #}
-{% extends 'bandeja.html.twig' %}
-{% block consulta %}
-    <form action="{{ path('crear_consulta') }}" method="post">
-      <table>
-        <tr>
-          <th colspan="2">Nueva Consulta</th>
-        </tr>
-        <tr>
-          <td><label for="asunto">Asunto</label></td>
-          <td>
-            <input type="text" id="asunto" name="asunto" maxlength="20" require />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="mensaje">Mensaje</label>
-          </td>
-          <td>
-            <textarea maxlength="255" name="mensaje" id="mensaje" cols="30" rows="10" require></textarea>
-          </td>
-        </tr>
-        <tr>
-          <td><label for="adjuntar">Adjuntar</label></td>
-          <td><input type="file" name="adjunto" /></td>
-        </tr>
-        <tr>
-          <td><label for="especialidad">Especialidad</label></td>
-          <td>
-            <select name="especialidad" id="especialidad">
-              <option value="" selected>--</option>
-            </select>
-          </td>
-        </tr>
-      </table>
-      <table id="medicos">
-        <tr>
-          <td>
-            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
-          </td>
-          <td>
-            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
-          </td>
-          <td>
-            <input type="checkbox" name="medicos[]" value="123456789" />Juan Perez
-          </td>
-        </tr>
-        <td><button class="button-24" role="button" type="reset">Borrar</button></td>
-        <td>
-          <button type="submit" id="button-25" class="button-24" role="button" >Crear</button>
-        </td>
-        </tr>
-      </table>
-    </form>
-    {% endblock %}
+{# templates/formularioConsulta.html.twig #} {% extends 'bandeja.html.twig' %}
+{% block jsformularioConsulta %}
+<script>
+  $(document).ready(function () {
+    $("#especialidad").on("change", function(){
+      let valor = document.getElementById('especialidad').value;
+      if(valor){
+        listar()
+      }else{
+        $("#medicos").html("")
+      }
+    });
+  });
+  function listar() {
+    $("#medicos").html("")
+      $.get(
+        "http://localhost/Telemedicina-Symfony/public/medicosPorEspecialidad/" +
+        $("#especialidad").val(),
+        function (data) {
+          let contador = 0;
+          for (i = 0; i < data.length; i = i + 2) {
+            let tr = document.createElement("tr");
+            for (y = i, j = 0; y < data.length && j < 2; y++, j++) {
+              let td = document.createElement("td");
+              let input = document.createElement("input");
+              tr.appendChild(td);
+              td.appendChild(input);
+              td.appendChild(
+                document.createTextNode(data[y][2] + " " + data[y][3])
+              );
+              input.setAttribute("type", "checkbox");
+              input.setAttribute("name", "medicos[]");
+              input.setAttribute("value", data[y][1]);
+            }
+            $("#medicos").append(tr);
+          }
+          let tr = document.createElement('tr')
+          let arr = [['reset', 'Borrar'], ['submit', 'Crear', "button-25"]]
+          for (i = 0; i < arr.length; i++) {
+            let td = document.createElement('td')
+            let boton = document.createElement('button');
+            boton.setAttribute('class', 'button-24')
+            boton.setAttribute('role', 'button')
+            for (y = 0; y <= 2; y = y + 2) {
+              if (y == 2) {
+                boton.setAttribute('id', arr[i][y])
+              } else if (y < 2) {
+                boton.setAttribute('type', arr[i][y])
+                boton.appendChild(document.createTextNode(arr[i][y + 1]))
+              }
+            }
+            td.appendChild(boton)
+            tr.appendChild(td)
+            $("#medicos").append(tr);
+          }
+        }
+      );
+  }
+</script>
+{% endblock %} {% block consulta %}
+<div class="nueva_consulta">
+<form action="{{ path('crear_consulta') }}" method="post">
+  <table>
+    <tr>
+      <th colspan="2">Nueva Consulta</th>
+    </tr>
+    <tr>
+      <td><label for="asunto">Asunto</label></td>
+      <td>
+        <input type="text" id="asunto" name="asunto" maxlength="20" require />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label for="mensaje">Mensaje</label>
+      </td>
+      <td>
+        <textarea maxlength="255" name="mensaje" id="mensaje" cols="30" rows="10" require></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="adjuntar">Adjuntar</label></td>
+      <td><input type="file" name="adjunto" /></td>
+    </tr>
+    <tr>
+      <td><label for="especialidad">Especialidad</label></td>
+      <td>
+        <select name="especialidad" id="especialidad">
+          <option value="" selected>--</option>
+          {% for especialidad in especialidades %}
+          <option value="{{ especialidad.codigo }}">
+            {{ especialidad.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+  </table>
+  <table id="medicos">
+  </table>
+</form>
+</div>
+{% endblock %}

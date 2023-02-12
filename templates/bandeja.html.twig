@@ -1,34 +1,50 @@
-{# templates/bandeja.html.twig #}
-{% extends 'base.html.twig' %}
+{# templates/bandeja.html.twig #} {% extends 'base.html.twig' %} 
+{% block js %}
+<script>
+  $(document).ready(function () {
+    $.get(
+      "http://localhost/Telemedicina-Symfony/public/recogerConsultas",
+      function (data) {
+        data.forEach((element) => {
+          let div = document.createElement("div");
+          let dl = document.createElement("dl");
+          let dt = document.createElement("dt");
+          let a = document.createElement("a");
+          let span = document.createElement("a");
+
+          div.appendChild(dl);
+          div.appendChild(a);
+          dl.appendChild(dt);
+          a.appendChild(span);
+          dt.appendChild(
+            document.createTextNode(element[2] + " : " + element[1])
+          );
+          a.setAttribute("href", "http://localhost/Telemedicina-Symfony/public/bandeja/consulta/"+element[0]);
+          span.setAttribute("class", "link");
+          if (element[3]) {
+            div.setAttribute("class", "leido");
+          }
+
+          $(".contenedor_consultas").append(div);
+        });
+      }
+    );
+  });
+</script>
+    {% block jsformularioConsulta %}
+    {% endblock %}
+{% endblock %} 
 {% block contenido %}
 <div class="conten">
   <div class="contenedor_consultas" id="">
     <div>
       Nueva Consulta
-      <a href="{{ path('formularioConsulta')}}">
+      <a href="{{ path('formularioConsulta') }}">
         <span class="link"></span>
       </a>
     </div>
-    {% for consulta in consultas %}
-    <div>
-      <dl>
-        <dt>{{consulta.2}}:{{consulta.1}}</dt>
-        <dd>principio de ultimo mensaje</dd>
-      </dl>
-      <a href="{{ path('chat',)}}">
-        <span class="link"></span>
-      </a>
-    </div>
-  
-    {% endfor %}
-
   </div>
-  <div class="consulta">
-    {% block consulta %}
-
-    {% endblock %}
-
-
-  </div>
+  {% block consulta %} 
+  {% endblock %}
 </div>
 {% endblock %}

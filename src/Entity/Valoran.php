@@ -7,38 +7,47 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity @ORM\Table(name="valoran")
  */
-class Valoracion implements UserInterface, \Serializable 
+class Valoran 
 {
     /**
-     * @ORM\Id @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="valoracion") 
+     */
+    private $valoracion;
+    /**
+     * @ORM\Id @ORM\Column(type="integer", name="codigo_consulta")
      */
     private $codigo_consulta;
     /**
-     * @ORM\Id @ORM\Column(type="integer")
+     * @ORM\Id @ORM\Column(type="integer", name="num_medico")
      */
     private $num_medico;
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="id_usuario") 
      */
-    private $valoracion;
+    private $id_usuario;
 
-    public function getCodigo() {
-        return $this->id;
-    }
-    public function setCodigo($codigo) {
-       $this->usuario = $usuario;
-    }
-    public function getNumCol() {
-        return $this->clave;
-    }
-    public function setNumCol($clave) {
-        $this->clave = $clave;
-    }
-	public function getValoracion() {
-        return $this->supervisor;
+    public function getValoracion() {
+        return $this->valoracion;
     }
     public function setValoracion($valoracion) {
         $this->valoracion = $valoracion;
     }
-
+    public function getCodigo() {
+        return $this->codigo_consulta;
+    }
+    public function setCodigo($codigo) {
+       $this->codigo = $codigo;
+    }
+    public function getNumCol() {
+        return $this->num_medico;
+    }
+    public function setNumCol($num_medico) {
+        $this->num_medico = $num_medico;
+    }
+    public function getIdUsuario() {
+        return $this->num_medico;
+    }
+    public function setIdUsuario($id_usuario) {
+        $this->id_usuario = $id_usuario;
+    }
 }

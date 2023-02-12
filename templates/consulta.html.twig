@@ -1,68 +1,174 @@
-{# templates/formularioConsulta.html.twig #}
+{# templates/consulta.html.twig #}
 {% extends 'bandeja.html.twig' %}
-{% block consultaaa %}
-<div class="datos_consulta">
-    <p>Consulta 1</p>
-    <span><button class="button-24" role="button">
-            Finalizar consulta
-        </button></span>
-    <table>
+{% block jsformularioConsulta %}
+<script>
+    $(document).ready(function () {
+        var objDiv = document.getElementById("contenedor_mensajes");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    })
+</script>
+{% endblock %}
+{% block consulta %}
+<div class="consulta">
+    <div class="datos_consulta">
+      <p>Consulta 1</p>
+      <span
+        ><button class="button-24" role="button">
+          Finalizar consulta
+        </button></span
+      >
+      <table>
         <tr>
-            <td>
-                <img class="consulta_foto"
-                    src="https://pbs.twimg.com/profile_images/1620481595256741890/as-9f7Z7_400x400.jpg" alt="none" />
-            </td>
-            <td>
-                <h3>Medico: Prueba</h3>
-            </td>
-            <td><label for="">Puntuación:</label></td>
-            <td>
-                <select name="puntos" id="">
-                    <option value="" selected>1</option>
-                    <option value="">2</option>
-                    <option value="">3</option>
-                    <option value="">4</option>
-                    <option value="">5</option>
-                </select>
-            </td>
+          <td>
+            <img
+              class="consulta_foto"
+              src="https://pbs.twimg.com/profile_images/1620481595256741890/as-9f7Z7_400x400.jpg"
+              alt="none"
+            />
+          </td>
+          <td><h3>Medico: Prueba</h3></td>
+          <td><label for="">Puntuación:</label></td>
+          <td>
+            <select name="puntos" id="">
+              <option value="" selected>1</option>
+              <option value="">2</option>
+              <option value="">3</option>
+              <option value="">4</option>
+              <option value="">5</option>
+            </select>
+          </td>
         </tr>
 
-    </table>
-</div>
-<div class="contenedor_mensajes" id="contenedor_mensajes">
-    {% for mensaje in consulta.contenedor_mensajes %}
-    <div class="der">
+      </table>
+    </div>
+    <div class="contenedor_mensajes" id="contenedor_mensajes">
+      <div class="der">
         <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
-            qui dignissimos officia vitae rem eaque, quidem minus repellat,
-            accusamus quam vel dolorum facilis, voluptatibus earum laborum
-            sint? Laboriosam, delectus dicta?
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
         </p>
-    </div>
-    <div class="izq">
+      </div>
+      <div class="izq">
         <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
-            qui dignissimos officia vitae rem eaque, quidem minus repellat,
-            accusamus quam vel dolorum facilis, voluptatibus earum laborum
-            sint? Laboriosam, delectus dicta?
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
         </p>
+      </div>
+      <div class="der">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="izq">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="der">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="izq">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="der">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="izq">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="der">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="izq">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="der">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="izq">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="der">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="izq">
+        <p>
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro
+          qui dignissimos officia vitae rem eaque, quidem minus repellat,
+          accusamus quam vel dolorum facilis, voluptatibus earum laborum
+          sint? Laboriosam, delectus dicta?
+        </p>
+      </div>
+      <div class="leido"><p>✓✓</p></div>
     </div>
-    <div class="leido">
-        <p>✓✓</p>
-    </div>
-    {% endfor %}
-</div>
-<div class="envio_mensaje">
-    <form action="">
-        <textarea maxlength="200" class="mensaje" name="mensaje" id="" rows="4"
-            placeholder="Escribe un mensaje"></textarea>
+    <div class="envio_mensaje">
+      <form action="">
+        <textarea
+          maxlength="200"
+          class="mensaje"
+          name="mensaje"
+          id=""
+          rows="4"
+          placeholder="Escribe un mensaje"
+        ></textarea>
         <input type="file" name="fichero" />
         <button id="" class="button-13" type="submit">Enviar</button>
-    </form>
-</div>
-    <script>
-      var objDiv = document.getElementById("contenedor_mensajes");
-      objDiv.scrollTop = objDiv.scrollHeight;
-    </script>
-
+      </form>
+    </div>
+  </div>
 {% endblock %}

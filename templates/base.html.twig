@@ -4,8 +4,13 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" href="estilos.css">
+        <link rel="stylesheet" href="{{ asset('estilos.css')}}">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+        <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+        <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+		{% block js %}
+        {% endblock %}
+
     </head>
     <body>
 		{% block body %}
@@ -15,7 +20,7 @@
 			{%endblock %}
 		    {% block contenido%}
 		    {% endblock%} 
-        </div>   
+        </div>
         {% endblock %}
     </body>
 </html>

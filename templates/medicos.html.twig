@@ -1,0 +1,66 @@
+{# templates/formularioConsulta.html.twig #} {% extends 'base.html.twig' %}
+{% block js %}
+<script>
+  $(document).ready(listar)
+  $(document).ready(function () {
+    $("#especialidad").on("change", listar);
+  });
+  function listar(){
+    $("#medicos").html("")
+      $.get(
+        "http://localhost/Telemedicina-Symfony/public/medicosPorEspecialidad/" +
+        $("#especialidad").val(),
+        function (data) {
+          for (i = 0; i < data.length; i++) {
+            let tr = document.createElement("tr");
+            let tdimg = document.createElement("td");
+            let img = document.createElement('img');
+
+            tr.appendChild(tdimg)
+            tdimg.appendChild(img)
+
+            img.setAttribute('class','consulta_foto')
+            let ubicacion ;
+            if(data[i][6]){
+              ubicacion = "data:image/png;base64," + data[i][6];
+            }else{
+              ubicacion = "{{ asset('default/foto.png')}}";
+            }
+            img.setAttribute('src',ubicacion);
+            img.setAttribute('alt',"none")
+
+            let tda = document.createElement("td");
+            let a = document.createElement("a");
+            tr.appendChild(tda)
+            tda.appendChild(a);
+            a.appendChild(document.createTextNode(data[i][2] + " " + data[i][3]))
+            
+            for (y = 4; y < data[i].length-1; y++) {
+              let td = document.createElement("td");
+              tr.appendChild(td);
+              td.appendChild(document.createTextNode(data[i][y]));
+            }
+            $("#medicos").append(tr);
+          }
+        }
+      );
+  }
+</script>
+{% endblock %} 
+{% block contenido %}
+<div class="conten">
+  <div class="categorias">
+    <select name="especialidad" id="especialidad">
+      <option value="" selected>Todo</option>
+      {% for especialidad in especialidades %}
+      <option value="{{ especialidad.codigo }}">
+        {{ especialidad.nombre }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="medicos">
+    <table id="medicos">
+    </table>
+  </div>
+  {% endblock %}

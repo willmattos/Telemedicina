@@ -1,4 +1,5 @@
 # Telemedicina-Symfony
+composer require friendsofsymfony/jsrouting-bundle
  composer update
  composer recipes:install symfony/apache-pack --force -v;
 

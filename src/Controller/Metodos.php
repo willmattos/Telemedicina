@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use Symfony\Component\Mailer\MailerInterface;
@@ -23,33 +24,67 @@ use App\Entity\Valoran;
 
 
 class Metodos extends AbstractController{
-        /**
-     * @Route("/medicos", name="medicos")
-     */
-    public function mostrarMedicos() {
-        return $this->render('bandeja.html.twig');
-    }
+   
     /**
      * @Route("/bandeja", name="bandeja")
      */
     public function bandeja() {
-        $datos = array();
-        $id = $this->getUser()->getId();
-        $entityManager = $this->getDoctrine()->getManager();
-        $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>$id));
-        for($i = 0;$i<count($consultas);$i++){
-            array_push($datos, array($consultas[$i]->getCodigo(),$consultas[$i]->getAsunto(),$consultas[$i]->getMedico()->getUsuario()->getNombre()));
-        }
-        var_dump($datos);
-        return $this->render('bandeja.html.twig', array('consultas' =>$datos));
+
+        return $this->render('bandeja.html.twig');
+        
     }
+
     /**
-     * @Route("/formularioConsulta", name="formularioConsulta")
+     * @Route("/medicos", name="medicos")
+     */
+    public function medicos() {
+        $entityManager = $this->getDoctrine()->getManager();
+        $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+        return $this->render('medicos.html.twig',array('especialidades' => $especialidades));
+    }
+
+    /**
+     * @Route("/perfil", name="perfil")
+     */
+    public function perfil() {
+        $entityManager = $this->getDoctrine()->getManager();
+        $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+
+        if($usuario->getFoto()){
+            $usuario->setFoto(base64_encode(stream_get_contents($usuario->getFoto())));
+        }else{
+            $usuario = null;
+        }
+        if(!$medico){
+            $medico = null;
+            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
+        }else{
+            $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
+        }
+
+    }
+    
+    /**
+     * @Route("/bandeja/nueva_consulta", name="formularioConsulta")
      */
     public function mostrarFormulario() {
-        return $this->render('formularioConsulta.html.twig');
+        $entityManager = $this->getDoctrine()->getManager();
+        $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+        return $this->render('formularioConsulta.html.twig',array('especialidades' => $especialidades));
     }
-        /**
+    
+    /**
+     * @Route("/bandeja/consulta/{consulta}", name="consulta")
+     */
+    public function cargarConsulta($consulta) {
+        
+        return $this->render('consulta.html.twig',array('consulta' => $consulta));
+    
+    }
+
+    /**
      * @Route("/bandeja/crearconsulta", name="crear_consulta")
      */
     public function crearConsulta() {
@@ -77,22 +112,57 @@ class Metodos extends AbstractController{
                 $entityManager->flush();
             }
         }
-        return $this->render('bandeja.html.twig');
+        return $this->redirectToRoute('bandeja');
+    }
+
+    //LO QUE NO SEA AJAX VA ARRIBA
+    //AQUI EMPEZAMOS AJAX
+
+    /**
+     * @Route("/recogerConsultas", name="recogerConsultas", methods={"GET"})
+     */
+    public function recogerConsultas() {
+        $datos = array();
+        $id = $this->getUser()->getId();
+        $entityManager = $this->getDoctrine()->getManager();
+        $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>1));
+        for($i = 0;$i<count($consultas);$i++){
+            array_push($datos, array($consultas[$i]->getCodigo(),$consultas[$i]->getAsunto(),$consultas[$i]->getMedico()->getUsuario()->getNombre(),$consultas[$i]->getLeido()));
+        }	
+        return new JsonResponse($datos);
+    
     }
     /**
-     * @Route("/bandeja/{num}", name="chat")
+     * @Route("/medicosPorEspecialidad/{codigo}", name="medicosPorEspecialidad", methods={"GET"})
      */
-    public function cargarChat() {
-        if(isset($_POST['asunto'] ) || isset($_POST['mensaje'])){
-        //return $this->render('chat.html.twig');
+    public function medicosPorEspecialidad($codigo=0) {
+        $entityManager = $this->getDoctrine()->getManager();
+        if($codigo){
+            $medicos = $entityManager->getRepository(Medico::class)->findBy(array('especialidad'=> $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=>$codigo))));
+        }else{
+            $medicos = $entityManager->getRepository(Medico::class)->findAll();
         }
+        $datos = array();
+        for($i = 0;$i<count($medicos);$i++){
+
+            $valoraciones = $entityManager->getRepository(Valoran::class)->findBy(array('num_medico'=> $medicos[$i]->getNumCol()));
+            $total = 0;
+            foreach($valoraciones as $valoracion){
+               $total += $valoracion->getValoracion();
+            }
+            if($total) $total /= count($valoraciones);
+
+            if($medicos[$i]->getUsuario()->getFoto()){
+                $medicos[$i]->getUsuario()->setFoto(base64_encode(stream_get_contents($medicos[$i]->getUsuario()->getFoto())));
+                $foto = $medicos[$i]->getUsuario()->getFoto();
+            }else{
+                $foto = null;
+            }
+
+            array_push($datos, array($medicos[$i]->getUsuario()->getId(),$medicos[$i]->getNumCol(),$medicos[$i]->getUsuario()->getNombre(),$medicos[$i]->getUsuario()->getApellido(),$medicos[$i]->getHospital(),$total,$foto));
+        }	
+        return new JsonResponse($datos);
+    
     }
-    /**
-     * @Route("/perfil", name="perfil")
-     */
-    public function cargarPerfil() {
-        
-        return $this->render('perfil.html.twig');
-        
-    }
+
 }

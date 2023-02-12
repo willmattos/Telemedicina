@@ -107,8 +107,8 @@ body {
 }
 .consulta_foto{
   width: 10vh;
-    height: 10vh;
-    border-radius: 2em;
+  height: 10vh;
+  border-radius: 5em;
 }
 .datos_consulta > * {
   margin: 1ex;
@@ -162,20 +162,34 @@ border: 1px solid #0a6bff;
 #button-25:active {
   opacity: 0.5;
 }
+#button-26{
+  background-color: #f4e603;
+border: 1px solid #f4e603;
+}
+#button-26:hover,
+#button-26:active {
+  background-color: initial;
+  background-position: 0 0;
+  color: #f4e603;
+}
+#button-26:active {
+  opacity: 0.5;
+}
 .contenedor_mensajes {
   overflow-y: scroll;
   height: 60%;
-  margin: 1ex;
 }
 .envio_mensaje {
-  margin: 1ex;
-  text-align: right;
-  float: right;
+  margin: 0px auto;
+  text-align: center;
   width: 50%;
-  padding-top: 1ex;
-  height: 15%;
+  overflow-y: auto;
 }
-.mensaje , #mensaje{
+.envio_mensaje form>*{
+  display: block;
+  margin: 1ex auto;
+}
+.mensaje{
   width: 97%;
   outline: none;
   resize: none;
@@ -270,13 +284,20 @@ h1 a:active,
 .perfil{
   text-align: center;
   margin: 1vh auto;
-  border: 1px solid;
-  width: 50%;
+  width: 60%;
+  height: 35vh;
 }
 .perfil .consulta_foto{
   width: 30vh;
-  height: auto;
+  height: 30vh;
   border-radius: 10vh;
+}
+.cambiosPerfil{
+  border: 1px solid;
+  text-align: center;
+}
+.cambiosPerfil>*{
+  margin: 15px;
 }
 .nueva_consulta th {
   font-size: 2em;
@@ -296,4 +317,13 @@ h1 a:active,
   margin: 20% auto;
   padding: 1ex;
   max-width: 50%;
+}
+.envio_mensaje{
+  border: 1px solid;
+}
+.actualizar{
+  text-align: center;
+}
+.actualizar>*{
+  margin: 1ex;
 }
