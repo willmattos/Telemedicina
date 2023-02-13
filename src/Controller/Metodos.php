@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -28,8 +29,14 @@ class Metodos extends AbstractController{
     /**
      * @Route("/bandeja", name="bandeja")
      */
-    public function bandeja() {
-
+    public function bandeja(UserPasswordHasherInterface $passwordHasher) {
+        /*
+        $entityManager = $this->getDoctrine()->getManager();
+        $user =$this->getUser();
+        $hashedPassword = $passwordHasher->hashPassword($user,'1234');
+        $this->getUser()->setClave($hashedPassword);
+        $entityManager->flush();
+        var_dump($this->getUser());*/
         return $this->render('bandeja.html.twig');
         
     }
@@ -63,7 +70,15 @@ class Metodos extends AbstractController{
             $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
             return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
         }
+    }
 
+    /**
+     * @Route("/registro", name="registro")
+     */
+    public function formularioRegistro() {
+
+        return $this->render('registro.html.twig');
+        
     }
     
     /**

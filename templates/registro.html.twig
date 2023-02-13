@@ -1,0 +1,35 @@
+{# templates/login.html.twig #}
+{% extends 'base.html.twig' %}
+{% block contenido %}  
+      <div class="conten">
+        <div class="login">
+		<form action="{{ path('ctrl_login') }}" method="post">
+          <table>
+            <tr>
+                <td><label for="">Nombre:</label></td>
+                <td><input type="text" id="nombre" name="nombre" /></td>
+            </tr>
+            <tr>
+                <td><label for="">Apellidos:</label></td>
+                <td><input type="text" id="apellido" name="apellido" /></td>
+            </tr>
+            <tr>
+              <td><label for="">Correo:</label></td>
+              <td><input type="text" id="correo" name="correo" /></td>
+            </tr>
+            <tr>
+              <td><label for="">Contraseña:</label></td>
+              <td><input type="password" id="clave" name="clave"/></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button id="button-25" class="button-24" role="button" type="submit">
+                  Registrarse
+                </button>
+              </td>
+            </tr>
+          </table>
+		  </form>
+        </div>
+      </div>
+{% endblock %}
