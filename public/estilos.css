@@ -318,12 +318,13 @@ h1 a:active,
   padding: 1ex;
   max-width: 50%;
 }
-.envio_mensaje{
-  border: 1px solid;
-}
 .actualizar{
   text-align: center;
 }
 .actualizar>*{
   margin: 1ex;
+}
+.datos_consulta td:last-child{
+  width: 100%;
+  text-align: right;
 }

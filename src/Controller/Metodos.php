@@ -94,8 +94,24 @@ class Metodos extends AbstractController{
      * @Route("/bandeja/consulta/{consulta}", name="consulta")
      */
     public function cargarConsulta($consulta) {
-        
-        return $this->render('consulta.html.twig',array('consulta' => $consulta));
+       
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()));
+        $consulta = $entityManager->getRepository(Consulta::class)->findOneBy(array('codigo'=>$consulta));
+        if($medico){
+            $nombre = $consulta->getUsuario()->getNombre();
+            $apellido = $consulta->getUsuario()->getApellido();
+        }else{
+            $nombre = $consulta->getMedico()->getUsuario()->getNombre();
+            $apellido = $consulta->getMedico()->getUsuario()->getApellido();
+        }
+        $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
+        $datos = $nombre . " " . $apellido . ": " . $consulta->getAsunto();
+
+        $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
+        if($valoracion) $valoracion = $valoracion->getValoracion();
+        return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion));
     
     }
 
@@ -134,16 +150,31 @@ class Metodos extends AbstractController{
     //AQUI EMPEZAMOS AJAX
 
     /**
-     * @Route("/recogerConsultas", name="recogerConsultas", methods={"GET"})
+     * @Route("/recogerConsultas", name="recogerConsultas", methods={"POST"})
      */
     public function recogerConsultas() {
         $datos = array();
-        $id = $this->getUser()->getId();
+
         $entityManager = $this->getDoctrine()->getManager();
-        $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>1));
-        for($i = 0;$i<count($consultas);$i++){
-            array_push($datos, array($consultas[$i]->getCodigo(),$consultas[$i]->getAsunto(),$consultas[$i]->getMedico()->getUsuario()->getNombre(),$consultas[$i]->getLeido()));
-        }	
+
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()));
+        if($medico){
+            $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('medico'=>$medico),array('fecha' => 'DESC'));
+        }else{
+            $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>$this->getUser()), array('fecha' => 'DESC'));
+        }
+        foreach ($consultas as $consulta) {
+            # code...
+            if($medico){
+                $nombre = $consulta->getUsuario()->getNombre();
+                $apellido = $consulta->getUsuario()->getApellido();
+            }else{
+                $nombre = $consulta->getMedico()->getUsuario()->getNombre();
+                $apellido = $consulta->getMedico()->getUsuario()->getApellido();
+            }
+            array_push($datos, array($consulta->getCodigo(),$consulta->getAsunto(),$nombre, $apellido,$consulta->getLeido()));
+        }
+
         return new JsonResponse($datos);
     
     }
