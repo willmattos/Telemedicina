@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
@@ -115,6 +115,36 @@ class Metodos extends AbstractController{
         return $this->redirectToRoute('bandeja');
     }
 
+
+     /**
+     * @Route("/bandeja/actualizarDatos", name="actualizarDatos")
+     */
+    public function actualizarDatos() {
+        $entityManager = $this->getDoctrine()->getManager();
+        $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+        //Cambiar Datos
+        //var_dump($_FILES);die;
+        if(isset($usuario)){
+            //En la tabla usuario
+            $usuario->setNombre($_POST['nombre']);
+            $usuario->setApellido($_POST['nombre']);
+            $image = $_FILES['foto']['tmp_name'];
+            $foto = addslashes(file_get_contents($image));
+            $usuario->setFoto($foto);
+            $entityManager->flush();
+
+            //En la tabla medico
+            $medico->setEspecialidad($_POST['especialidad']);
+            $medico->setHospital($_POST['hospital']);
+            $entityManager->flush();
+        }
+
+        //Cargar su perfil de nuevo
+        $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+        return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
+    
+    }
     //LO QUE NO SEA AJAX VA ARRIBA
     //AQUI EMPEZAMOS AJAX
 
