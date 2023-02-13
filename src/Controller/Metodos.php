@@ -123,21 +123,26 @@ class Metodos extends AbstractController{
         $entityManager = $this->getDoctrine()->getManager();
         $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
         $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+        $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
         //Cambiar Datos
+        //var_dump($_POST);
         //var_dump($_FILES);die;
         if(isset($usuario)){
             //En la tabla usuario
             $usuario->setNombre($_POST['nombre']);
             $usuario->setApellido($_POST['nombre']);
-            $image = $_FILES['foto']['tmp_name'];
-            $foto = addslashes(file_get_contents($image));
-            $usuario->setFoto($foto);
+            if($_FILES['foto']['tmp_name']){
+                $image = $_FILES['foto']['tmp_name'];
+                $foto = addslashes(file_get_contents($image));
+                $usuario->setFoto($foto);
+                $entityManager->flush();
+            }
             $entityManager->flush();
 
             //En la tabla medico
-            $medico->setEspecialidad($_POST['especialidad']);
-            $medico->setHospital($_POST['hospital']);
-            $entityManager->flush();
+            //$medico->setEspecialidad($especialidad->getCodigo());
+            //$medico->setHospital($_POST['hospital']);
+            //$entityManager->flush();
         }
 
         //Cargar su perfil de nuevo
