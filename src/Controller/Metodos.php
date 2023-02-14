@@ -167,6 +167,7 @@ class Metodos extends AbstractController{
             $medico->setEspecialidad($especialidad);
             $medico->setHospital($_POST['hospital']);
             $cv = $_FILES['cv']['tmp_name'];
+            var_dump($cv);die;
             if($cv){
                 $filesystem = new Filesystem();
                 $directorio = dirname(__FILE__);
