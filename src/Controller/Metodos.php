@@ -111,7 +111,7 @@ class Metodos extends AbstractController{
 
         $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
         if($valoracion) $valoracion = $valoracion->getValoracion();
-        return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion));
+        return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion, 'consulta' => $consulta));
     
     }
 
@@ -144,6 +144,25 @@ class Metodos extends AbstractController{
             }
         }
         return $this->redirectToRoute('bandeja');
+    }
+     /**
+     * @Route("/bandeja/enviarMensaje", name="enviarMensaje")
+     */
+    public function enviarMensaje() {
+        if(isset($_POST['mensaje'] ) || isset($_POST['fichero'])){
+                $entityManager = $this->getDoctrine()->getManager();
+                //Creamos la mensaje
+                $mensaje = new Mensaje();
+                $mensaje->setMensaje($_POST['mensaje']);
+                
+                //Cambiar por lo de fichero
+                $mensaje->setAdjunto($_POST['fichero']);
+                $mensaje->setConsulta($entityManager->find(Consulta::class,$_GET['consulta']));
+                $mensaje->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
+                $entityManager->persist($mensaje);
+                $entityManager->flush();
+        }
+        return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
     }
 
     //LO QUE NO SEA AJAX VA ARRIBA

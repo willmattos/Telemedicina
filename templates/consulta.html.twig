@@ -60,7 +60,7 @@
     {% endfor %}
   </div>
   <div class="envio_mensaje">
-    <form action="">
+    <form action="{{path('enviarMensaje', {'consulta':consulta.getCodigo()})}}" method="post">
       <textarea maxlength="200" class="mensaje" name="mensaje" id="" rows="4"
         placeholder="Escribe un mensaje"></textarea>
       <input type="file" name="fichero" />
