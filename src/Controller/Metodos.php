@@ -129,7 +129,7 @@ class Metodos extends AbstractController{
         if(isset($usuario)){
             //En la tabla usuario
             $usuario->setNombre($_POST['nombre']);
-            $usuario->setApellido($_POST['nombre']);
+            $usuario->setApellido($_POST['apellido']);
             if($_FILES['foto']['tmp_name']){
                 $stream = fopen($_FILES['fichero']['tmp_name'],'rb');
                 $usuario->setFoto(base64_encode(stream_get_contents($stream)));
@@ -138,9 +138,9 @@ class Metodos extends AbstractController{
             $entityManager->flush();
 
             //En la tabla medico
-            //$medico->setEspecialidad($especialidad->getCodigo());
-            //$medico->setHospital($_POST['hospital']);
-            //$entityManager->flush();
+            $medico->setEspecialidad($especialidad);
+            $medico->setHospital($_POST['hospital']);
+            $entityManager->flush();
         }
 
         //Cargar su perfil de nuevo
