@@ -159,9 +159,7 @@ class Metodos extends AbstractController{
             if($_FILES['foto']['tmp_name']){
                 $stream = fopen($_FILES['fichero']['tmp_name'],'rb');
                 $usuario->setFoto(base64_encode(stream_get_contents($stream)));
-                $entityManager->flush();
             }
-            $entityManager->flush();
 
             //En la tabla medico
             $medico->setEspecialidad($especialidad);
