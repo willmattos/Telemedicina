@@ -40,23 +40,16 @@
     {% for mensaje in mensajes %}
       {% if app.user.getId() == mensaje.getUsuario().getId() %}
         <div class="der">
-          <p>
-            {{ mensaje.getMensaje()}}
-            {% if not mensaje.getAdjunto() is empty %}
-            <a href="">mensaje.getAdjunto()</a>
-            {% endif %}
-          </p>
-        </div>
       {% else %}
       <div class="izq">
-        <p>
-          {{ mensaje.getMensaje()}}
-          {% if not mensaje.getAdjunto() is empty %}
-          <a href="">mensaje.getAdjunto()</a>
-          {% endif %}
-        </p>
-      </div>
       {%endif%}
+        <div>
+        <p>{{ mensaje.getMensaje()|striptags('<p>')|raw }}</p>
+        {% if not mensaje.getAdjunto() is empty %}
+          <p><a href="">mensaje.getAdjunto()</a></p>
+        {% endif %}
+        </div>
+      </div>
     {% endfor %}
   </div>
   <div class="envio_mensaje">

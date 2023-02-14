@@ -122,6 +122,9 @@ class Metodos extends AbstractController{
                     $apellido = $consulta->getMedico()->getUsuario()->getApellido();
                 }
                 $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
+                foreach ($mensajes as $mensaje) {
+                    $mensaje->setMensaje(str_replace("\n", '</p><p>', $mensaje->getMensaje()));
+                }
                 $datos = $nombre . " " . $apellido . ": " . $consulta->getAsunto();
         
                 $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
@@ -199,12 +202,12 @@ class Metodos extends AbstractController{
             if(!$usuario){
 
             }
+            return $this->redirectToRoute('medicos');
         }
         
 
-        return $this->redirectToRoute('bandeja');
+        return $this->redirectToRoute('medicos');
     }
-
 
     //LO QUE NO SEA AJAX VA ARRIBA
     //AQUI EMPEZAMOS AJAX
