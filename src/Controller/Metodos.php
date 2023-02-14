@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
-
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Entity\Consulta;
@@ -24,7 +26,31 @@ use App\Entity\Valoran;
 
 
 class Metodos extends AbstractController{
-   
+   /**
+     * @Route("/ejemplo", name="ejemplo")
+     */
+    public function ejemplo() {
+        //$usuario = $this->getUser();
+        //var_dump($usuario->getId());die;
+        try {
+            $filesystem = new Filesystem();
+            $finder = new Finder();
+            $directorio = dirname(__FILE__);
+            $usuario = $this->getUser();
+            $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
+            if(is_dir($directorio.'/../../public/Usuarios/'.$usuario->getId())){
+                    echo null;
+            }else{
+                $filesystem->mkdir(
+                    Path::normalize($directorio.'/../../public/Usuarios/'.$usuario->getId()),
+                );
+            } 
+           }
+           catch (IOExceptionInterface $exception) {
+            echo "An error occurred while creating your directory at ".$exception->getPath();
+        }
+        return $this->render('bandeja.html.twig');   
+    }
     /**
      * @Route("/bandeja", name="bandeja")
      */
@@ -140,6 +166,13 @@ class Metodos extends AbstractController{
             //En la tabla medico
             $medico->setEspecialidad($especialidad);
             $medico->setHospital($_POST['hospital']);
+            $cv = $_FILES['cv']['tmp_name'];
+            $filesystem = new Filesystem();
+            $directorio = dirname(__FILE__);
+            $usuario = $this->getUser();
+            $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
+            $filesystem->copy($cv, $ruta);
+            var_dump($cv);
             $entityManager->flush();
         }
 
