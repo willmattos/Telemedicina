@@ -165,12 +165,14 @@ class Metodos extends AbstractController{
             $medico->setEspecialidad($especialidad);
             $medico->setHospital($_POST['hospital']);
             $cv = $_FILES['cv']['tmp_name'];
-            $filesystem = new Filesystem();
-            $directorio = dirname(__FILE__);
-            $usuario = $this->getUser();
-            $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
-            $filesystem->copy($cv, $ruta);
-            var_dump($cv);
+            if($cv){
+                $filesystem = new Filesystem();
+                $directorio = dirname(__FILE__);
+                $usuario = $this->getUser();
+                $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
+                $filesystem->copy($cv, $ruta);
+                var_dump($cv);
+            }
             $entityManager->flush();
         }
 
