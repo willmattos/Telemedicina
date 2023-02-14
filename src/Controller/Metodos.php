@@ -48,11 +48,11 @@ class Metodos extends AbstractController{
      */
     public function perfil() {
         $entityManager = $this->getDoctrine()->getManager();
-        $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
+        $usuario = $this->getUser();
         $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
 
         if($usuario->getFoto()){
-            $usuario->setFoto(base64_encode(stream_get_contents($usuario->getFoto())));
+            $usuario = $usuario->getFoto();
         }else{
             $usuario = null;
         }
@@ -63,9 +63,8 @@ class Metodos extends AbstractController{
             $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
             return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
         }
-
     }
-    
+        
     /**
      * @Route("/bandeja/nueva_consulta", name="formularioConsulta")
      */
@@ -121,7 +120,7 @@ class Metodos extends AbstractController{
      */
     public function actualizarDatos() {
         $entityManager = $this->getDoctrine()->getManager();
-        $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
+        $usuario = $this->getUser();
         $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
         $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
         //Cambiar Datos
@@ -132,9 +131,8 @@ class Metodos extends AbstractController{
             $usuario->setNombre($_POST['nombre']);
             $usuario->setApellido($_POST['nombre']);
             if($_FILES['foto']['tmp_name']){
-                $image = $_FILES['foto']['tmp_name'];
-                $foto = addslashes(file_get_contents($image));
-                $usuario->setFoto($foto);
+                $stream = fopen($_FILES['fichero']['tmp_name'],'rb');
+                $usuario->setFoto(base64_encode(stream_get_contents($stream)));
                 $entityManager->flush();
             }
             $entityManager->flush();
@@ -188,7 +186,6 @@ class Metodos extends AbstractController{
             if($total) $total /= count($valoraciones);
 
             if($medicos[$i]->getUsuario()->getFoto()){
-                $medicos[$i]->getUsuario()->setFoto(base64_encode(stream_get_contents($medicos[$i]->getUsuario()->getFoto())));
                 $foto = $medicos[$i]->getUsuario()->getFoto();
             }else{
                 $foto = null;
@@ -200,4 +197,19 @@ class Metodos extends AbstractController{
     
     }
 
+    /**
+     * @Route("/foto", name="foto", methods={"GET"})
+     */
+    /*    public function testAction(){   
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $entityManager->find(Usuario::class,4);
+            $file = $usuario->getFoto();              
+            $response = new Response(base64_decode($file), 200, array(
+                    'Content-Type' => 'application/octet-stream',
+                    'Content-Disposition' => 'attachment; filename="fotoperfil.jpg"'
+            ));
+            
+            return $response; 
+        }
+    */
 }

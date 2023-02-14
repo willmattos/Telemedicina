@@ -177,7 +177,7 @@
           {% if usuario is null %}
           <img id="consulta_foto" class="consulta_foto" src="{{ asset('default/foto.png')}}" alt="foto perfil" />
           {% else %}
-          <img id="consulta_foto" class="consulta_foto" src="data:image/png;base64,{{usuario.foto}}" alt="foto perfil" />
+          <img id="consulta_foto" class="consulta_foto" src="data:image/png;base64,{{ usuario }} " alt="foto perfil" />
           {% endif %}
         </td>
         <td>Nombre y Apellidos:</td>

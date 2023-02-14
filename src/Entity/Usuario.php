@@ -36,7 +36,7 @@ class Usuario implements UserInterface, \Serializable
      */
     private $rol;
     /**
-     * @ORM\Column(type="blob", name = "foto")
+     * @ORM\Column(type="text", name = "foto")
      */
     private $foto;
     /**
