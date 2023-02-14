@@ -29,7 +29,8 @@ class Metodos extends AbstractController{
     /**
      * @Route("/bandeja", name="bandeja")
      */
-    public function bandeja(UserPasswordHasherInterface $passwordHasher) {
+    public function bandeja() {
+        //public function bandeja(UserPasswordHasherInterface $passwordHasher) {
         /*
         $entityManager = $this->getDoctrine()->getManager();
         $user =$this->getUser();
@@ -37,8 +38,10 @@ class Metodos extends AbstractController{
         $this->getUser()->setClave($hashedPassword);
         $entityManager->flush();
         var_dump($this->getUser());*/
-        return $this->render('bandeja.html.twig');
-        
+        if($this->isGranted('ROLE_USER')){
+            return $this->render('bandeja.html.twig');
+        }
+        return $this->redirectToRoute('ctrl_login');
     }
 
     /**
@@ -54,22 +57,27 @@ class Metodos extends AbstractController{
      * @Route("/perfil", name="perfil")
      */
     public function perfil() {
-        $entityManager = $this->getDoctrine()->getManager();
-        $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
-        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+        if($this->isGranted('ROLE_USER')){
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
+            $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+    
+            if($usuario->getFoto()){
+                $usuario->setFoto(base64_encode(stream_get_contents($usuario->getFoto())));
+            }else{
+                $usuario = null;
+            }
+            if(!$medico){
+                $medico = null;
+                return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
+            }else{
+                $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+                return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
+            }
+        }
+        return $this->redirectToRoute('bandeja');
 
-        if($usuario->getFoto()){
-            $usuario->setFoto(base64_encode(stream_get_contents($usuario->getFoto())));
-        }else{
-            $usuario = null;
-        }
-        if(!$medico){
-            $medico = null;
-            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
-        }else{
-            $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
-            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
-        }
+        
     }
 
     /**
@@ -85,41 +93,52 @@ class Metodos extends AbstractController{
      * @Route("/bandeja/nueva_consulta", name="formularioConsulta")
      */
     public function mostrarFormulario() {
+        if($this->isGranted('ROLE_USER')){
         $entityManager = $this->getDoctrine()->getManager();
-        $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
-        return $this->render('formularioConsulta.html.twig',array('especialidades' => $especialidades));
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()));
+        if(!$medico){
+            $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+            return $this->render('formularioConsulta.html.twig',array('especialidades' => $especialidades));
+        }
+        }
+        return $this->redirectToRoute('bandeja');
     }
     
     /**
      * @Route("/bandeja/consulta/{consulta}", name="consulta")
      */
-    public function cargarConsulta($consulta) {
-       
+    public function cargarConsulta($consulta = null) {
+        if($this->isGranted('ROLE_USER') && $consulta){
+        
         $entityManager = $this->getDoctrine()->getManager();
-
-        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()));
         $consulta = $entityManager->getRepository(Consulta::class)->findOneBy(array('codigo'=>$consulta));
-        if($medico){
-            $nombre = $consulta->getUsuario()->getNombre();
-            $apellido = $consulta->getUsuario()->getApellido();
-        }else{
-            $nombre = $consulta->getMedico()->getUsuario()->getNombre();
-            $apellido = $consulta->getMedico()->getUsuario()->getApellido();
+        if($consulta){
+            if(($consulta->getUsuario()->getId() == $this->getUser()->getId()) || ($consulta->getMedico()->getUsuario()->getId() == $this->getUser()->getId())){
+                if($medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()))){
+                    $nombre = $consulta->getUsuario()->getNombre();
+                    $apellido = $consulta->getUsuario()->getApellido();
+                }else{
+                    $nombre = $consulta->getMedico()->getUsuario()->getNombre();
+                    $apellido = $consulta->getMedico()->getUsuario()->getApellido();
+                }
+                $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
+                $datos = $nombre . " " . $apellido . ": " . $consulta->getAsunto();
+        
+                $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
+                if($valoracion) $valoracion = $valoracion->getValoracion();
+                return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion, 'consulta' => $consulta));
+            }
         }
-        $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
-        $datos = $nombre . " " . $apellido . ": " . $consulta->getAsunto();
-
-        $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
-        if($valoracion) $valoracion = $valoracion->getValoracion();
-        return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion, 'consulta' => $consulta));
-    
+        
+        }
+        return $this->redirectToRoute('bandeja');
     }
 
     /**
-     * @Route("/bandeja/crearconsulta", name="crear_consulta")
+     * @Route("/bandeja/crearconsulta", name="crear_consulta", methods={"POST"})
      */
     public function crearConsulta() {
-        if(isset($_POST['asunto'] ) || isset($_POST['mensaje']) || isset($_POST['adjunto']) || isset($_POST['medicos'])){
+        if(isset($_POST['asunto'] ) && isset($_POST['mensaje']) && isset($_POST['medicos']) && $_POST['asunto'] && $_POST['mensaje'] && $_POST['medicos']){
             foreach($_POST['medicos'] as $medico){
                 $entityManager = $this->getDoctrine()->getManager();
                
@@ -128,7 +147,7 @@ class Metodos extends AbstractController{
                 $consulta->setAsunto($_POST['asunto']);
                 $consulta->setLeido(0);
                 $consulta->setCompletado(0);
-                $consulta->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
+                $consulta->setUsuario($this->getUser());
                 $consulta->setMedico($entityManager->find(Medico::class,$_POST['medicos'][0]));
                 $entityManager->persist($consulta);
                 $entityManager->flush();
@@ -136,19 +155,23 @@ class Metodos extends AbstractController{
                 //Creamos el mensaje
                 $mensaje = new Mensaje();
                 $mensaje->setMensaje($_POST['mensaje']);
-                $mensaje->setAdjunto($_POST['adjunto']);
-                $mensaje->setConsulta($entityManager->find(Consulta::class,$consulta->getCodigo()));
-                $mensaje->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
+                if(isset($_FILES['adjunto'])){
+                    $mensaje->setAdjunto($_FILES['adjunto']);
+                }
+                $mensaje->setConsulta($consulta);
+                $mensaje->setUsuario($this->getUser());
                 $entityManager->persist($mensaje);
                 $entityManager->flush();
+                $consulta = $consulta->getCodigo();
             }
         }
-        return $this->redirectToRoute('bandeja');
+        return $this->redirectToRoute('consulta', array('consulta' => $consulta));
     }
      /**
-     * @Route("/bandeja/enviarMensaje", name="enviarMensaje")
+     * @Route("/bandeja/enviarMensaje", name="enviarMensaje", methods={"POST"})
      */
     public function enviarMensaje() {
+
         if(isset($_POST['mensaje'] ) || isset($_POST['fichero'])){
                 $entityManager = $this->getDoctrine()->getManager();
                 //Creamos la mensaje
@@ -165,24 +188,43 @@ class Metodos extends AbstractController{
         return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
     }
 
+     /**
+     * @Route("/registro/crear", name="crearcuenta", methods={"POST"})
+     */
+    public function crearCuenta() {
+
+        if(!$this->isGranted('ROLE_USER')){
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('correo'=> $_POST['correo']));
+            if(!$usuario){
+
+            }
+        }
+        
+
+        return $this->redirectToRoute('bandeja');
+    }
+
+
     //LO QUE NO SEA AJAX VA ARRIBA
     //AQUI EMPEZAMOS AJAX
 
     /**
-     * @Route("/recogerConsultas", name="recogerConsultas", methods={"POST"})
+     * @Route("/recogerConsultas", name="recogerConsultas")
      */
     public function recogerConsultas() {
         $datos = array();
-
-        $entityManager = $this->getDoctrine()->getManager();
-
-        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()));
-        if($medico){
-            $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('medico'=>$medico),array('fecha' => 'DESC'));
-        }else{
-            $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>$this->getUser()), array('fecha' => 'DESC'));
-        }
-        foreach ($consultas as $consulta) {
+        if($this->isGranted('ROLE_USER')){
+            
+            $entityManager = $this->getDoctrine()->getManager();
+            
+            $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()));
+            if($medico){
+                $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('medico'=>$medico),array('fecha' => 'DESC'));
+            }else{
+                $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>$this->getUser()), array('fecha' => 'DESC'));
+            }
+            foreach ($consultas as $consulta) {
             # code...
             if($medico){
                 $nombre = $consulta->getUsuario()->getNombre();
@@ -193,8 +235,9 @@ class Metodos extends AbstractController{
             }
             array_push($datos, array($consulta->getCodigo(),$consulta->getAsunto(),$nombre, $apellido,$consulta->getLeido()));
         }
-
+        
         return new JsonResponse($datos);
+    }
     
     }
     /**
