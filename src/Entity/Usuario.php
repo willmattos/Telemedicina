@@ -43,6 +43,14 @@ class Usuario implements UserInterface, \Serializable
      * @ORM\Column(type="integer", name = "bloquear")
      */
     private $bloquear;
+    /**
+     * @ORM\Column(type="integer", name = "recuperacion")
+     */
+    private $recuperacion;
+    /**
+     * @ORM\Column(type="integer", name = "activado")
+     */
+    private $activado;
 
     /**
      * @return mixed
@@ -96,6 +104,18 @@ class Usuario implements UserInterface, \Serializable
     public function setBloquear($bloquear) {
         $this->bloquear = $bloquear;
     }
+    public function getRecupercacion() {
+        return $this->recuperacion;
+    }
+    public function setRecuperacion($recuperacion) {
+        $this->recuperacion = $recuperacion;
+    }
+    public function getActivado() {
+        return $this->activado;
+    }
+    public function setActivado($activado) {
+        $this->activado = $activado;
+    }
  	// =======================================================
 	// Elementos necesarios para la autenticación
 	// =======================================================
@@ -137,6 +157,8 @@ class Usuario implements UserInterface, \Serializable
             $this->rol,
             $this->foto,
 			$this->bloquear,
+			$this->recuperacion,
+			$this->activado
         ));
     }
 	
@@ -149,7 +171,11 @@ class Usuario implements UserInterface, \Serializable
             $this->clave,
             $this->rol,
             $this->foto,
-			$this->bloquear
+			$this->bloquear,
+			$this->recuperacion,
+			$this->activado
             ) = unserialize($serialized);
     }
 }
+
+   

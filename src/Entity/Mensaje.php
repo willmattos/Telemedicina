@@ -51,16 +51,16 @@ class Mensaje
         $this->mensaje = $mensaje;
     }
 	public function getAdjunto() {
-        return $this->fecha;
+        return $this->adjunto;
     }
     public function setAdjunto($adjunto) {
         $this->adjunto = $adjunto;
     }
  	public function getFecha() {
-        return $this->leido;
+        return $this->fecha_hora;
     }
-    public function setFecha($leido) {
-        $this->leido = $leido;
+    public function setFecha($fecha_hora) {
+        $this->fecha_hora = $fecha_hora;
     }
     public function getConsulta() {
         return $this->codigo_consulta;
