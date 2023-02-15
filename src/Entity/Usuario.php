@@ -43,7 +43,7 @@ class Usuario implements UserInterface, \Serializable
      * @ORM\Column(type="integer", name = "bloquear")
      */
     private $bloquear;
-        /**
+    /**
      * @ORM\Column(type="integer", name = "recuperacion")
      */
     private $recuperacion;
@@ -157,6 +157,8 @@ class Usuario implements UserInterface, \Serializable
             $this->rol,
             $this->foto,
 			$this->bloquear,
+			$this->recuperacion,
+			$this->activado
         ));
     }
 	
@@ -169,7 +171,9 @@ class Usuario implements UserInterface, \Serializable
             $this->clave,
             $this->rol,
             $this->foto,
-			$this->bloquear
+			$this->bloquear,
+			$this->recuperacion,
+			$this->activado
             ) = unserialize($serialized);
     }
 }
