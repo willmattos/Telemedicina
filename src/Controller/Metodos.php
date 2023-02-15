@@ -8,12 +8,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
-
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Entity\Consulta;
@@ -25,7 +28,31 @@ use App\Entity\Valoran;
 
 
 class Metodos extends AbstractController{
-   
+   /**
+     * @Route("/ejemplo", name="ejemplo")
+     */
+    public function ejemplo() {
+        //$usuario = $this->getUser();
+        //var_dump($usuario->getId());die;
+        try {
+            $filesystem = new Filesystem();
+            $finder = new Finder();
+            $directorio = dirname(__FILE__);
+            $usuario = $this->getUser();
+            $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
+            if(is_dir($directorio.'/../../public/Usuarios/'.$usuario->getId())){
+                    echo null;
+            }else{
+                $filesystem->mkdir(
+                    Path::normalize($directorio.'/../../public/Usuarios/'.$usuario->getId()),
+                );
+            } 
+           }
+           catch (IOExceptionInterface $exception) {
+            echo "An error occurred while creating your directory at ".$exception->getPath();
+        }
+        return $this->render('bandeja.html.twig');   
+    }
     /**
      * @Route("/bandeja", name="bandeja")
      */
@@ -57,6 +84,33 @@ class Metodos extends AbstractController{
      * @Route("/perfil", name="perfil")
      */
     public function perfil() {
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $usuario = $this->getUser();
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+
+        if($usuario->getFoto()){
+            $usuario = $usuario->getFoto();
+        }else{
+            $usuario = null;
+        }
+        if(!$medico){
+            $medico = null;
+            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
+        }else{
+            $usuario = $this->getUser();
+            $filesystem = new Filesystem();
+            $directorio = dirname(__FILE__);
+            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+            $rutaP = 'Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+            $ruta = $filesystem->exists($rutaF);
+            if(!$ruta){
+                $rutaP= null;
+            }
+            $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades, 'cv' =>$rutaP));
+        }
+
         if($this->isGranted('ROLE_USER')){
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
@@ -88,7 +142,7 @@ class Metodos extends AbstractController{
         return $this->render('registro.html.twig');
         
     }
-    
+        
     /**
      * @Route("/bandeja/nueva_consulta", name="formularioConsulta")
      */
@@ -209,6 +263,51 @@ class Metodos extends AbstractController{
         return $this->redirectToRoute('medicos');
     }
 
+
+     /**
+     * @Route("/bandeja/actualizarDatos", name="actualizarDatos")
+     */
+    public function actualizarDatos() {
+        $entityManager = $this->getDoctrine()->getManager();
+        $usuario = $this->getUser();
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+        $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
+        //Cambiar Datos
+        //var_dump($_POST);
+        //var_dump($_FILES);die;
+        if(isset($usuario)){
+            //En la tabla usuario
+            $usuario->setNombre($_POST['nombre']);
+            $usuario->setApellido($_POST['apellido']);
+            if($_FILES['foto']['tmp_name']){
+                $stream = fopen($_FILES['foto']['tmp_name'],'rb');
+                $usuario->setFoto(base64_encode(stream_get_contents($stream)));
+            }
+
+            //En la tabla medico
+            $medico->setEspecialidad($especialidad);
+            $medico->setHospital($_POST['hospital']);
+            $cv = $_FILES['cv']['tmp_name'];
+            $nombre = $_FILES['cv']['name'];
+            $directorio = dirname(__FILE__);
+          
+            $entityManager->flush();
+            
+
+            if($cv){
+                $filesystem = new Filesystem();
+                $directorio = dirname(__FILE__);
+                $usuario = $this->getUser();
+                $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
+                $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+                $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
+                $cv = $rutaF;
+            }else{
+                $cv = null;
+            }
+        }
+        return $this->redirectToRoute('perfil');
+    }
     //LO QUE NO SEA AJAX VA ARRIBA
     //AQUI EMPEZAMOS AJAX
 
@@ -264,7 +363,6 @@ class Metodos extends AbstractController{
             if($total) $total /= count($valoraciones);
 
             if($medicos[$i]->getUsuario()->getFoto()){
-                $medicos[$i]->getUsuario()->setFoto(base64_encode(stream_get_contents($medicos[$i]->getUsuario()->getFoto())));
                 $foto = $medicos[$i]->getUsuario()->getFoto();
             }else{
                 $foto = null;
@@ -276,4 +374,19 @@ class Metodos extends AbstractController{
     
     }
 
+    /**
+     * @Route("/foto", name="foto", methods={"GET"})
+     */
+    /*    public function testAction(){   
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $entityManager->find(Usuario::class,4);
+            $file = $usuario->getFoto();              
+            $response = new Response(base64_decode($file), 200, array(
+                    'Content-Type' => 'application/octet-stream',
+                    'Content-Disposition' => 'attachment; filename="fotoperfil.jpg"'
+            ));
+            
+            return $response; 
+        }
+    */
 }

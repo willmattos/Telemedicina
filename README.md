@@ -95,3 +95,8 @@ Notas Ivan
     asunto 
     codigo de consulta
 
+
+--------Meter en el cmd----------
+composer require symfony/filesystem
+composer require symfony/finder
+
