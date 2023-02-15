@@ -17,6 +17,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            anonymous:    true
             lazy: true
             form_login:
                 login_path: ctrl_login
@@ -25,6 +26,8 @@ security:
             provider: telemedicina
             logout:
                 path:   ctrl_logout
-                target: ctrl_login    
-        
-        
+                target: ctrl_login 
+            
+    access_control:
+        - { path: ^/registro, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/crearcuenta, role: IS_AUTHENTICATED_ANONYMOUSLY }

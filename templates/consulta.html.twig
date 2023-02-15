@@ -10,55 +10,66 @@
 {% endblock %}
 {% block consulta %}
 <div class="consulta">
-  <table class="datos_consulta">
-    <tr>
-      <td>
-        <img class="consulta_foto" src="https://pbs.twimg.com/profile_images/1620481595256741890/as-9f7Z7_400x400.jpg"
-          alt="none" />
-      </td>
-      <td>
-        <h3>{{ datos }}</h3>
-      </td>
+  <div class="datos_consulta">
+    <div>
+      <table>
+        <tr>
+          <td>
+            {% if foto is null %}
+            <img class="consulta_foto" src="{{ asset('default/foto.png')}}" alt="foto perfil" />
+            {% else %}
+            <img class="consulta_foto" src="data:image/png;base64,{{ foto }}" alt="foto perfil" />
+            {% endif %}
+          </td>
+          <td>
+            <h3>{{ datos }}</h3>
+          </td>
+        </tr>
+      </table>
+    </div>
+  <div>
+    <div class="mitad">
       {% if mensajes.0.getConsulta().getCompletado() == 0 %}
-      <td> <button class="button-24" role="button">
-          Finalizar consulta
-        </button></td>
+      <button class="button-24" role="button">Finalizar consulta</button>
       {% elseif valoracion == 0 %}
-      <td><label for="">Puntuación:</label><select name="puntos" id="">
-          <option value="" selected>1</option>
-          <option value="">2</option>
-          <option value="">3</option>
-          <option value="">4</option>
-          <option value="">5</option>
-        </select></td>
+      <label for="">Puntuación:</label><select name="puntos" id="">
+        <option value="" selected>1</option>
+        <option value="">2</option>
+        <option value="">3</option>
+        <option value="">4</option>
+        <option value="">5</option>
+      </select>
       {% else %}
-      <td>Puntuación: {{ valoracion }}</td>
+      <p>Puntuación: {{ valoracion }}</p>
       {%endif%}
-    </tr>
-  </table>
-  <div class="contenedor_mensajes" id="contenedor_mensajes">
-    {% for mensaje in mensajes %}
-      {% if app.user.getId() == mensaje.getUsuario().getId() %}
-        <div class="der">
-      {% else %}
-      <div class="izq">
-      {%endif%}
-        <div>
-        <p>{{ mensaje.getMensaje()|striptags('<p>')|raw }}</p>
-        {% if not mensaje.getAdjunto() is empty %}
-          <p><a href="">mensaje.getAdjunto()</a></p>
-        {% endif %}
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-  <div class="envio_mensaje">
-    <form action="{{path('enviarMensaje', {'consulta':consulta.getCodigo()})}}" method="post">
-      <textarea maxlength="200" class="mensaje" name="mensaje" id="" rows="4"
-        placeholder="Escribe un mensaje"></textarea>
-      <input type="file" name="fichero" />
-      <button id="" class="button-13" type="submit">Enviar</button>
-    </form>
+    </div>
   </div>
 </div>
-{% endblock %}
+
+  <div class="contenedor_mensajes" id="contenedor_mensajes">
+    {% for mensaje in mensajes %}
+    {% if app.user.getId() == mensaje.getUsuario().getId() %}
+    <div class="der">
+      {% else %}
+      <div class="izq">
+        {%endif%}
+        <div>
+          <p>{{ mensaje.getMensaje()|striptags('
+          <p>')|raw }}</p>
+          {% if not mensaje.getAdjunto() is empty %}
+          <p><a href="">mensaje.getAdjunto()</a></p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="envio_mensaje">
+      <form action="{{path('enviarMensaje', {'consulta':consulta.getCodigo()})}}" method="post">
+        <textarea maxlength="200" class="mensaje" name="mensaje" id="" rows="4"
+          placeholder="Escribe un mensaje"></textarea>
+        <input type="file" name="fichero" />
+        <button id="" class="button-13" type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+  {% endblock %}

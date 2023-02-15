@@ -114,14 +114,7 @@ class Metodos extends AbstractController{
         
     }
 
-    /**
-     * @Route("/registro", name="registro")
-     */
-    public function formularioRegistro() {
 
-        return $this->render('registro.html.twig');
-        
-    }
         
     /**
      * @Route("/bandeja/nueva_consulta", name="formularioConsulta")
@@ -151,9 +144,11 @@ class Metodos extends AbstractController{
                 if($medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()))){
                     $nombre = $consulta->getUsuario()->getNombre();
                     $apellido = $consulta->getUsuario()->getApellido();
+                    $foto = $consulta->getUsuario()->getFoto();
                 }else{
                     $nombre = $consulta->getMedico()->getUsuario()->getNombre();
                     $apellido = $consulta->getMedico()->getUsuario()->getApellido();
+                    $foto = $consulta->getMedico()->getUsuario()->getFoto();
                 }
                 $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
                 foreach ($mensajes as $mensaje) {
@@ -163,7 +158,7 @@ class Metodos extends AbstractController{
         
                 $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
                 if($valoracion) $valoracion = $valoracion->getValoracion();
-                return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion, 'consulta' => $consulta));
+                return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion, 'consulta' => $consulta, 'foto' => $foto));
             }
         }
         
@@ -187,7 +182,6 @@ class Metodos extends AbstractController{
                 $consulta->setUsuario($this->getUser());
                 $consulta->setMedico($entityManager->find(Medico::class,$_POST['medicos'][0]));
                 $entityManager->persist($consulta);
-                $entityManager->flush();
                 
                 //Creamos el mensaje
                 $mensaje = new Mensaje();
@@ -224,25 +218,6 @@ class Metodos extends AbstractController{
         }
         return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
     }
-
-     /**
-     * @Route("/registro/crear", name="crearcuenta", methods={"POST"})
-     */
-    public function crearCuenta() {
-
-        if(!$this->isGranted('ROLE_USER')){
-            $entityManager = $this->getDoctrine()->getManager();
-            $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('correo'=> $_POST['correo']));
-            if(!$usuario){
-
-            }
-            return $this->redirectToRoute('medicos');
-        }
-        
-
-        return $this->redirectToRoute('medicos');
-    }
-
 
      /**
      * @Route("/bandeja/actualizarDatos", name="actualizarDatos")

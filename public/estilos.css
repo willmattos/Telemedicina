@@ -94,24 +94,25 @@ body {
   float: left;
   overflow-y: scroll;
 }
-.datos_consulta {
-  height: 20%;
-}
-.datos_consulta p {
+.datos_consulta>div{
+  box-sizing: border-box;
+  width: 50%;
   display: inline-block;
-  font-weight: bold;
-  font-size: x-large;
+  float: left;
+  height: 100%;
 }
-.datos_consulta span {
-  float: right;
+.datos_consulta{
+  overflow: auto;
+  height: 11vh ;
+  text-align: right;
+}
+.mitad{
+  margin: 3vh 1vh;
 }
 .consulta_foto{
   width: 10vh;
   height: 10vh;
   border-radius: 5em;
-}
-.datos_consulta > * {
-  margin: 1ex;
 }
 /* CSS */
 .button-24 {
@@ -124,10 +125,11 @@ body {
   cursor: pointer;
   display: inline-block;
   font-family: nunito, roboto, proxima-nova, "proxima nova", sans-serif;
-  font-size: 16px;
+  font-size: 2vh;
   font-weight: 800;
   line-height: 16px;
-  min-height: 40px;
+  min-height: 4vh;
+  max-height: 4vh;
   outline: 0;
   padding: 12px 14px;
   text-align: center;
@@ -178,6 +180,7 @@ border: 1px solid #f4e603;
 .contenedor_mensajes {
   overflow-y: scroll;
   height: 60%;
+  padding: 1ex;
 }
 .envio_mensaje {
   margin: 0px auto;
@@ -329,8 +332,4 @@ h1 a:active,
 }
 .actualizar>*{
   margin: 1ex;
-}
-.datos_consulta td:last-child{
-  width: 60%;
-  text-align: right;
 }

@@ -8,8 +8,12 @@
   let dat;
 
   $(document).ready(function () {
-    datos = parseInt(document.getElementById('datos').innerText);  
-    
+    datos = "{{ medico|json_encode() }}"  
+    if(datos == "null"){
+      datos = 3;
+    }else{
+      datos = 7;
+    }
     document.getElementById('consulta_foto').parentNode.setAttribute('rowspan',datos-1)
     
     $('#button-26').click(modoEditar)
@@ -187,10 +191,7 @@
         <td>Correo:</td>
         <td class="correo">{{app.user.getCorreo()}}</td>
       </tr>
-      {% if medico is  null %}
-      <span id="datos" style="display: none;">3</span>
-      {% else %}
-      <span id="datos" style="display: none;">7</span>
+      {% if not medico is  null %}
       <tr>
         <td>Colegiado:</td>
         <td class="colegiado">{{medico.getNumCol()}}</td>

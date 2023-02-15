@@ -104,7 +104,7 @@ class Usuario implements UserInterface, \Serializable
     public function setBloquear($bloquear) {
         $this->bloquear = $bloquear;
     }
-    public function getRecupercacion() {
+    public function getRecuperacion() {
         return $this->recuperacion;
     }
     public function setRecuperacion($recuperacion) {
