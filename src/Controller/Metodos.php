@@ -159,20 +159,26 @@ class Metodos extends AbstractController{
             if($_FILES['foto']['tmp_name']){
                 $stream = fopen($_FILES['foto']['tmp_name'],'rb');
                 $usuario->setFoto(base64_encode(stream_get_contents($stream)));
-                $entityManager->flush();
             }
-            $entityManager->flush();
 
             //En la tabla medico
             $medico->setEspecialidad($especialidad);
             $medico->setHospital($_POST['hospital']);
+            var_dump($_FILES['cv']);
             $cv = $_FILES['cv']['tmp_name'];
-            $filesystem = new Filesystem();
+            $nombre = $_FILES['cv']['name'];
             $directorio = dirname(__FILE__);
-            $usuario = $this->getUser();
-            $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
-            $filesystem->copy($cv, $ruta);
-            var_dump($cv);
+            
+            if($cv){
+                $filesystem = new Filesystem();
+                $directorio = dirname(__FILE__);
+                $usuario = $this->getUser();
+                $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
+                $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre);
+                var_dump($mover);
+                //$filesystem->copy($cv, $ruta);
+                var_dump($cv);
+            }
             $entityManager->flush();
         }
 
