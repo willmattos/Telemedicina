@@ -84,25 +84,23 @@ class Metodos extends AbstractController{
      * @Route("/perfil", name="perfil")
      */
     public function perfil() {
+        if($this->isGranted('ROLE_USER')){
 
         $entityManager = $this->getDoctrine()->getManager();
         $usuario = $this->getUser();
         $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
 
-        if($usuario->getFoto()){
-            $usuario = $usuario->getFoto();
-        }else{
+        if(!$usuario->getFoto()){
             $usuario = null;
         }
         if(!$medico){
             $medico = null;
             return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
         }else{
-            $usuario = $this->getUser();
             $filesystem = new Filesystem();
             $directorio = dirname(__FILE__);
-            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
-            $rutaP = 'Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+            $rutaF = $directorio.'/../../public/Usuarios/u'.$this->getUser()->getId().'/cv/'.'curriculum.pdf';
+            $rutaP = 'Usuarios/u'.$this->getUser()->getId().'/cv/'.'curriculum.pdf';
             $ruta = $filesystem->exists($rutaF);
             if(!$ruta){
                 $rutaP= null;
@@ -110,24 +108,6 @@ class Metodos extends AbstractController{
             $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
             return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades, 'cv' =>$rutaP));
         }
-
-        if($this->isGranted('ROLE_USER')){
-            $entityManager = $this->getDoctrine()->getManager();
-            $usuario = $entityManager->find(Usuario::class,$this->getUser()->getId());
-            $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
-    
-            if($usuario->getFoto()){
-                $usuario->setFoto(base64_encode(stream_get_contents($usuario->getFoto())));
-            }else{
-                $usuario = null;
-            }
-            if(!$medico){
-                $medico = null;
-                return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
-            }else{
-                $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
-                return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
-            }
         }
         return $this->redirectToRoute('bandeja');
 
@@ -268,46 +248,45 @@ class Metodos extends AbstractController{
      * @Route("/bandeja/actualizarDatos", name="actualizarDatos")
      */
     public function actualizarDatos() {
-        $entityManager = $this->getDoctrine()->getManager();
-        $usuario = $this->getUser();
-        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
-        $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
-        //Cambiar Datos
-        //var_dump($_POST);
-        //var_dump($_FILES);die;
-        if(isset($usuario)){
-            //En la tabla usuario
+        if($this->isGranted('ROLE_USER')){
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $this->getUser();
+            $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+            
             $usuario->setNombre($_POST['nombre']);
             $usuario->setApellido($_POST['apellido']);
+
+            if($medico){
+                $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
+                $medico->setEspecialidad($especialidad);
+                $medico->setHospital($_POST['hospital']);
+                $cv = $_FILES['cv']['tmp_name'];
+                $nombre = $_FILES['cv']['name'];
+                $directorio = dirname(__FILE__);
+
+                if($cv){
+                    $filesystem = new Filesystem();
+                    $directorio = dirname(__FILE__);
+                    $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
+                    $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+                    $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
+                    $cv = $rutaF;
+                }else{
+                    $cv = null;
+                }
+            }
+            //En la tabla usuario
+            
             if($_FILES['foto']['tmp_name']){
                 $stream = fopen($_FILES['foto']['tmp_name'],'rb');
                 $usuario->setFoto(base64_encode(stream_get_contents($stream)));
             }
-
-            //En la tabla medico
-            $medico->setEspecialidad($especialidad);
-            $medico->setHospital($_POST['hospital']);
-            $cv = $_FILES['cv']['tmp_name'];
-            $nombre = $_FILES['cv']['name'];
-            $directorio = dirname(__FILE__);
           
             $entityManager->flush();
-            
-
-            if($cv){
-                $filesystem = new Filesystem();
-                $directorio = dirname(__FILE__);
-                $usuario = $this->getUser();
-                $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
-                $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
-                $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
-                $cv = $rutaF;
-            }else{
-                $cv = null;
-            }
         }
         return $this->redirectToRoute('perfil');
     }
+    
     //LO QUE NO SEA AJAX VA ARRIBA
     //AQUI EMPEZAMOS AJAX
 
