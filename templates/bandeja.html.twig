@@ -2,7 +2,7 @@
 {% block js %}
 <script>
   $(document).ready(function () {
-    $.get(
+    $.post(
       "http://localhost/Telemedicina-Symfony/public/recogerConsultas",
       function (data) {
         data.forEach((element) => {
@@ -17,7 +17,7 @@
           dl.appendChild(dt);
           a.appendChild(span);
           dt.appendChild(
-            document.createTextNode(element[2] + " : " + element[1])
+            document.createTextNode(element[2] + " " + element[3] + " : " + element[1])
           );
           a.setAttribute("href", "http://localhost/Telemedicina-Symfony/public/bandeja/consulta/"+element[0]);
           span.setAttribute("class", "link");

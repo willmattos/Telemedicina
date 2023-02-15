@@ -4,9 +4,14 @@ security:
              entity:
                  class: App\Entity\Usuario
                  property: correo
-    encoders:
-         App\Entity\Usuario:
-          algorithm: plaintext
+    password_hashers:
+        # auto hasher with default options for the User class (and children)
+        App\Entity\Usuario: 'auto'
+
+        # auto hasher with custom options for all PasswordAuthenticatedUserInterface instances
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: 'auto'
+            cost:      15
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
