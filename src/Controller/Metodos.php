@@ -157,7 +157,7 @@ class Metodos extends AbstractController{
             $usuario->setNombre($_POST['nombre']);
             $usuario->setApellido($_POST['apellido']);
             if($_FILES['foto']['tmp_name']){
-                $stream = fopen($_FILES['fichero']['tmp_name'],'rb');
+                $stream = fopen($_FILES['foto']['tmp_name'],'rb');
                 $usuario->setFoto(base64_encode(stream_get_contents($stream)));
                 $entityManager->flush();
             }
