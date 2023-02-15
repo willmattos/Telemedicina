@@ -86,8 +86,17 @@ class Metodos extends AbstractController{
             $medico = null;
             return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
         }else{
+            $usuario = $this->getUser();
+            $filesystem = new Filesystem();
+            $directorio = dirname(__FILE__);
+            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+            $rutaP = 'Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+            $ruta = $filesystem->exists($rutaF);
+            if(!$ruta){
+                $rutaP= null;
+            }
             $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
-            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
+            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades, 'cv' =>$rutaP));
         }
     }
         
@@ -164,28 +173,26 @@ class Metodos extends AbstractController{
             //En la tabla medico
             $medico->setEspecialidad($especialidad);
             $medico->setHospital($_POST['hospital']);
-            var_dump($_FILES['cv']);
             $cv = $_FILES['cv']['tmp_name'];
             $nombre = $_FILES['cv']['name'];
             $directorio = dirname(__FILE__);
+          
+            $entityManager->flush();
             
+
             if($cv){
                 $filesystem = new Filesystem();
                 $directorio = dirname(__FILE__);
                 $usuario = $this->getUser();
                 $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
-                $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre);
-                var_dump($mover);
-                //$filesystem->copy($cv, $ruta);
-                var_dump($cv);
+                $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+                $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
+                $cv = $rutaF;
+            }else{
+                $cv = null;
             }
-            $entityManager->flush();
         }
-
-        //Cargar su perfil de nuevo
-        $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
-        return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades));
-    
+        return $this->redirectToRoute('perfil');
     }
     //LO QUE NO SEA AJAX VA ARRIBA
     //AQUI EMPEZAMOS AJAX

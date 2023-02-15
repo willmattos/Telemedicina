@@ -215,8 +215,11 @@
       </tr>
       <tr>
         <td>Curriculum:</td>
+
         <td id="cv">
-          <a href="">{{medico.getCV()}}</a>
+        {% if not cv is null%}
+          <a href="{{cv}}" download>curriculum.pdf</a>
+          {%endif%}
         </td>
       </tr>
       {% endif %}
