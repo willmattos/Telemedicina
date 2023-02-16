@@ -53,7 +53,29 @@ class Correo extends AbstractController{
                         $entityManager->persist($usuario);
                         $entityManager->flush();
 
-                        $ruta = substr($_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], 0, -11);
+                        function url_origin($s, $use_forwarded_host=false) {
+
+                            $ssl = ( ! empty($s['HTTPS']) && $s['HTTPS'] == 'on' ) ? true:false;
+                            $sp = strtolower( $s['SERVER_PROTOCOL'] );
+                            $protocol = substr( $sp, 0, strpos( $sp, '/'  )) . ( ( $ssl ) ? 's' : '' );
+                          
+                            $port = $s['SERVER_PORT'];
+                            $port = ( ( ! $ssl && $port == '80' ) || ( $ssl && $port=='443' ) ) ? '' : ':' . $port;
+                            
+                            $host = ( $use_forwarded_host && isset( $s['HTTP_X_FORWARDED_HOST'] ) ) ? $s['HTTP_X_FORWARDED_HOST'] : ( isset( $s['HTTP_HOST'] ) ? $s['HTTP_HOST'] : null );
+                            $host = isset( $host ) ? $host : $s['SERVER_NAME'] . $port;
+                          
+                            return $protocol . '://' . $host;
+                          
+                          }
+                          
+                          function full_url( $s, $use_forwarded_host=false ) {
+                            return url_origin( $s, $use_forwarded_host ) . $s['REQUEST_URI'];
+                          }
+                          
+                          $absolute_url = full_url( $_SERVER );
+                        
+                        $ruta = substr($absolute_url, 0, -11);
                         $ruta = $ruta . "activar/" .$usuario->getRecuperacion();
                         $email = (new Email())
                         ->from('noreply@telemedicina.com')
@@ -63,7 +85,7 @@ class Correo extends AbstractController{
                         //->replyTo('fabien@example.com')
                         //->priority(Email::PRIORITY_HIGH)
                         ->subject('Activa tu cuenta')
-                        ->html("<a href=\"http://$ruta\">Activar mi cuenta</a>");
+                        ->html("<a href=\"$ruta\">Activar mi cuenta</a>");
                         $dns='smtp://537b291161b1d5:69f08f99c0af5d@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
                         $transport = Transport::fromDsn($dns);
                         $mailer = new Mailer($transport);
