@@ -23,6 +23,7 @@ security:
                 login_path: ctrl_login
                 check_path: ctrl_login
                 default_target_path: bandeja
+                always_use_default_target_path: true
             provider: telemedicina
             logout:
                 path:   ctrl_logout
