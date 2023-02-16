@@ -1,0 +1,26 @@
+{# templates/recuperar.html.twig #}
+{% extends 'base.html.twig' %}
+{% block contenido %}  
+      <div class="conten">
+        <div class="login">
+		<form action="{{ path('enviarcorreo') }}" method="post">
+          <table>
+            <tr>
+                <td colspan="2">Enviar correo de recuperacion</td>
+            </tr>
+            <tr>
+                <td><label for="">Correo:</label></td>
+                <td><input type="text" id="correo" name="correo" /></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button id="button-25" class="button-24" role="button" type="submit">
+                  Registrarse
+                </button>
+              </td>
+            </tr>
+          </table>
+		  </form>
+        </div>
+      </div>
+{% endblock %}
