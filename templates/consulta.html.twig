@@ -57,14 +57,14 @@
           <p>{{ mensaje.getMensaje()|striptags('
           <p>')|raw }}</p>
           {% if not mensaje.getAdjunto() is empty %}
-          <p><a href="">mensaje.getAdjunto()</a></p>
+          <p><a href="{{ruta}}" download>{{mensaje.getAdjunto()}}</a></p>
           {% endif %}
         </div>
       </div>
       {% endfor %}
     </div>
     <div class="envio_mensaje">
-      <form action="{{path('enviarMensaje', {'consulta':consulta.getCodigo()})}}" method="post">
+      <form enctype="multipart/form-data" action="{{path('enviarMensaje', {'consulta':consulta.getCodigo()})}}" method="post">
         <textarea maxlength="200" class="mensaje" name="mensaje" id="" rows="4"
           placeholder="Escribe un mensaje"></textarea>
         <input type="file" name="fichero" />

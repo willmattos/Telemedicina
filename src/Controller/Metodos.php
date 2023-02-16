@@ -28,6 +28,7 @@ use App\Entity\Valoran;
 
 
 class Metodos extends AbstractController{
+
    /**
      * @Route("/ejemplo", name="ejemplo")
      */
@@ -40,11 +41,12 @@ class Metodos extends AbstractController{
             $directorio = dirname(__FILE__);
             $usuario = $this->getUser();
             $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
-            if(is_dir($directorio.'/../../public/Usuarios/'.$usuario->getId())){
+            if(is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId())){
                     echo null;
             }else{
+                echo("Hola");
                 $filesystem->mkdir(
-                    Path::normalize($directorio.'/../../public/Usuarios/'.$usuario->getId()),
+                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId()),
                 );
             } 
            }
@@ -136,7 +138,6 @@ class Metodos extends AbstractController{
      */
     public function cargarConsulta($consulta = null) {
         if($this->isGranted('ROLE_USER') && $consulta){
-        
         $entityManager = $this->getDoctrine()->getManager();
         $consulta = $entityManager->getRepository(Consulta::class)->findOneBy(array('codigo'=>$consulta));
         if($consulta){
@@ -153,12 +154,22 @@ class Metodos extends AbstractController{
                 $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
                 foreach ($mensajes as $mensaje) {
                     $mensaje->setMensaje(str_replace("\n", '</p><p>', $mensaje->getMensaje()));
+                    $rutaM = $mensaje->getAdjunto();
+                   
                 }
                 $datos = $nombre . " " . $apellido . ": " . $consulta->getAsunto();
-        
+                $filesystem = new Filesystem();
+               // var_dump($consulta->getAdjunto());die;
+                $directorio = dirname(__FILE__);
+                $rutaF = $directorio.'/../../public/Usuarios/u'.$this->getUser()->getId().'/chats/';
+                $rutaP = 'Usuarios/u'.$this->getUser()->getId().'/chats/'.$rutaM;
+                $ruta = $filesystem->exists($rutaF);
+                if(!$ruta){
+                    $rutaP= null;
+                }
                 $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
                 if($valoracion) $valoracion = $valoracion->getValoracion();
-                return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes, 'valoracion' => $valoracion, 'consulta' => $consulta, 'foto' => $foto));
+                return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes,'ruta'=> $rutaP ,'valoracion' => $valoracion, 'consulta' => $consulta, 'foto' => $foto, 'archivo' => $rutaF));
             }
         }
         
@@ -202,23 +213,45 @@ class Metodos extends AbstractController{
      * @Route("/bandeja/enviarMensaje", name="enviarMensaje", methods={"POST"})
      */
     public function enviarMensaje() {
-
-        if(isset($_POST['mensaje'] ) || isset($_POST['fichero'])){
+        if(isset($_POST['mensaje'] ) && isset($_FILES['fichero'])){
+            if($_POST['mensaje'] || $_FILES['fichero']){
+                $usuario = $this->getUser();
                 $entityManager = $this->getDoctrine()->getManager();
-                //Creamos la mensaje
                 $mensaje = new Mensaje();
-                $mensaje->setMensaje($_POST['mensaje']);
-                
-                //Cambiar por lo de fichero
-                $mensaje->setAdjunto($_POST['fichero']);
                 $mensaje->setConsulta($entityManager->find(Consulta::class,$_GET['consulta']));
                 $mensaje->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
+                if($_POST['mensaje']){
+                    $mensaje->setMensaje($_POST['mensaje']);
+                }
+                if($_FILES['fichero']){
+                    $mensaje->setAdjunto($this->quitar_acentos($_FILES['fichero']['name']));
+                    $cv = $_FILES['fichero']['tmp_name'];
+                    $nombre = $_FILES['fichero']['name'];
+                    $directorio = dirname(__FILE__);
+                    if($cv){
+                        $filesystem = new Filesystem();
+                        $directorio = dirname(__FILE__);
+                        $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/');
+                        if($ruta){
+                            //Mete el fichero en la carpeta
+                            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre);
+                            $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre));
+                        }else{
+                            $this->comprobarcarpetaMensaje($usuario);
+                            //Mete el fichero en la carpeta
+
+                            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre);
+                            $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre));
+                        }
+                }
+                    
+                }
                 $entityManager->persist($mensaje);
                 $entityManager->flush();
+            }   
         }
         return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
     }
-
      /**
      * @Route("/bandeja/actualizarDatos", name="actualizarDatos")
      */
@@ -243,11 +276,16 @@ class Metodos extends AbstractController{
                     $filesystem = new Filesystem();
                     $directorio = dirname(__FILE__);
                     $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
-                    $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
-                    $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
-                    $cv = $rutaF;
-                }else{
-                    $cv = null;
+                    if($ruta){
+                        //Mete el curriculum en la carpeta
+                        $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+                        $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
+                    }else{
+                        $this->comprobarcarpetaCv($usuario);
+                        //Mete el curriculum en la carpeta
+                        $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
+                        $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
+                    }
                 }
             }
             //En la tabla usuario
@@ -343,4 +381,58 @@ class Metodos extends AbstractController{
             return $response; 
         }
     */
+//Funciones
+
+    //Funcion para crear la carpeta de usuario y dentro de el la de chats
+    private function comprobarcarpetaMensaje($usuario){
+        try {
+            $filesystem = new Filesystem();
+            $finder = new Finder();
+            $directorio = dirname(__FILE__);
+            $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId());
+            if(is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId()) && is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats')){
+                    echo null;
+            }else{
+                $filesystem->mkdir(
+                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId()),
+                );
+                $filesystem->mkdir(
+                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats'),
+                );
+            } 
+        }
+        catch (IOExceptionInterface $exception) {
+            echo "An error occurred while creating your directory at ".$exception->getPath();
+        }
+    }
+    //Funcion para crear la carpeta de usuario y dentro de el la de cv
+    private function comprobarcarpetaCv($usuario){
+        try {
+            $filesystem = new Filesystem();
+            $finder = new Finder();
+            $directorio = dirname(__FILE__);
+            $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId());
+            if(is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId()) && is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv')){
+                    echo null;
+            }else{
+                $filesystem->mkdir(
+                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId()),
+                );
+                $filesystem->mkdir(
+                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv'),
+                );
+            } 
+           }
+           catch (IOExceptionInterface $exception) {
+            echo "An error occurred while creating your directory at ".$exception->getPath();
+        }
+    }
+    private function quitar_acentos($cadena){
+        $originales = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿ';
+        $modificadas = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyyby';
+        $cadena = utf8_decode($cadena);
+        $cadena = strtr($cadena, utf8_decode($originales), $modificadas);
+        return str_replace(' ', '', utf8_encode($cadena));
+    }
 }
+
