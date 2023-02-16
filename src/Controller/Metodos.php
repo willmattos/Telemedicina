@@ -11,6 +11,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
@@ -154,22 +157,26 @@ class Metodos extends AbstractController{
                 $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
                 foreach ($mensajes as $mensaje) {
                     $mensaje->setMensaje(str_replace("\n", '</p><p>', $mensaje->getMensaje()));
-                    $rutaM = $mensaje->getAdjunto();
-                   
+                    if($mensaje->getAdjunto()){
+                        $directory = dirname(__FILE__);
+                        $id = $mensaje->getUsuario()->getId();
+                        $codconsulta = "con" . $mensaje->getConsulta()->getCodigo();
+                        $codmensaje = $mensaje->getCodigo();
+                        $idconsulta = $mensaje->getConsulta()->getCodigo();
+                        $ficheroname = $mensaje->getAdjunto();
+                        $absolute_url = $this->full_url($_SERVER);
+
+                        $borrar = "bandeja/consulta/$idconsulta";
+                        $ruta = substr($absolute_url, 0, -1*strlen($borrar));
+                        $directorio = $ruta . "Usuarios/u$id/$codconsulta/men$codmensaje";
+                        $extension = pathinfo($mensaje->getAdjunto(), PATHINFO_EXTENSION);
+                        $mensaje->setAdjunto($directorio . "/$ficheroname");
+                    }
                 }
                 $datos = $nombre . " " . $apellido . ": " . $consulta->getAsunto();
-                $filesystem = new Filesystem();
-               // var_dump($consulta->getAdjunto());die;
-                $directorio = dirname(__FILE__);
-                $rutaF = $directorio.'/../../public/Usuarios/u'.$this->getUser()->getId().'/chats/';
-                $rutaP = 'Usuarios/u'.$this->getUser()->getId().'/chats/'.$rutaM;
-                $ruta = $filesystem->exists($rutaF);
-                if(!$ruta){
-                    $rutaP= null;
-                }
                 $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
                 if($valoracion) $valoracion = $valoracion->getValoracion();
-                return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes,'ruta'=> $rutaP ,'valoracion' => $valoracion, 'consulta' => $consulta, 'foto' => $foto, 'archivo' => $rutaF));
+                return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes,'valoracion' => $valoracion, 'consulta' => $consulta, 'foto' => $foto));
             }
         }
         
@@ -220,38 +227,60 @@ class Metodos extends AbstractController{
                 $mensaje = new Mensaje();
                 $mensaje->setConsulta($entityManager->find(Consulta::class,$_GET['consulta']));
                 $mensaje->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
+                $entityManager->persist($mensaje);
+                $entityManager->flush();
+
                 if($_POST['mensaje']){
                     $mensaje->setMensaje($_POST['mensaje']);
                 }
                 if($_FILES['fichero']){
-                    $mensaje->setAdjunto($this->quitar_acentos($_FILES['fichero']['name']));
+                    $mensaje->setAdjunto($_FILES['fichero']['name']);
                     $cv = $_FILES['fichero']['tmp_name'];
                     $nombre = $_FILES['fichero']['name'];
-                    $directorio = dirname(__FILE__);
                     if($cv){
                         $filesystem = new Filesystem();
-                        $directorio = dirname(__FILE__);
-                        $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/');
-                        if($ruta){
-                            //Mete el fichero en la carpeta
-                            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre);
-                            $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre));
-                        }else{
-                            $this->comprobarcarpetaMensaje($usuario);
-                            //Mete el fichero en la carpeta
-
-                            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre);
-                            $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats/'.$this->quitar_acentos($nombre));
+                        $directory = dirname(__FILE__);
+                        $id = $usuario->getId();
+                        $consulta = "con" . $mensaje->getConsulta()->getCodigo();
+                        $codmensaje = $mensaje->getCodigo();
+                        $directorio = $directory . "/../../public/Usuarios/u$id";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
                         }
+                        $directorio = $directory . "/../../public/Usuarios/u$id/$consulta";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
+                        }
+                        $directorio = $directory . "/../../public/Usuarios/u$id/$consulta";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
+                        }
+                        $directorio = $directory . "/../../public/Usuarios/u$id/$consulta/men$codmensaje";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
+                        }
+                        $extension = pathinfo($nombre, PATHINFO_EXTENSION);
+                        $mover = move_uploaded_file($cv, $directorio . "/$nombre." . $extension);
                 }
-                    
                 }
-                $entityManager->persist($mensaje);
                 $entityManager->flush();
             }   
         }
         return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
     }
+
      /**
      * @Route("/bandeja/actualizarDatos", name="actualizarDatos")
      */
@@ -434,5 +463,25 @@ class Metodos extends AbstractController{
         $cadena = strtr($cadena, utf8_decode($originales), $modificadas);
         return str_replace(' ', '', utf8_encode($cadena));
     }
+
+   private function url_origin($s, $use_forwarded_host=false) {
+
+        $ssl = ( ! empty($s['HTTPS']) && $s['HTTPS'] == 'on' ) ? true:false;
+        $sp = strtolower( $s['SERVER_PROTOCOL'] );
+        $protocol = substr( $sp, 0, strpos( $sp, '/'  )) . ( ( $ssl ) ? 's' : '' );
+      
+        $port = $s['SERVER_PORT'];
+        $port = ( ( ! $ssl && $port == '80' ) || ( $ssl && $port=='443' ) ) ? '' : ':' . $port;
+        
+        $host = ( $use_forwarded_host && isset( $s['HTTP_X_FORWARDED_HOST'] ) ) ? $s['HTTP_X_FORWARDED_HOST'] : ( isset( $s['HTTP_HOST'] ) ? $s['HTTP_HOST'] : null );
+        $host = isset( $host ) ? $host : $s['SERVER_NAME'] . $port;
+      
+        return $protocol . '://' . $host;
+      
+      }
+      
+     private function full_url( $s, $use_forwarded_host=false ) {
+        return $this->url_origin( $s, $use_forwarded_host ) . $s['REQUEST_URI'];
+      }
 }
 

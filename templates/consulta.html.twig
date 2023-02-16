@@ -49,15 +49,14 @@
   <div class="contenedor_mensajes" id="contenedor_mensajes">
     {% for mensaje in mensajes %}
     {% if app.user.getId() == mensaje.getUsuario().getId() %}
-    <div class="der">
+      <div class="der">
       {% else %}
       <div class="izq">
         {%endif%}
         <div>
-          <p>{{ mensaje.getMensaje()|striptags('
-          <p>')|raw }}</p>
+          <p>{{ mensaje.getMensaje()|striptags('<p>')|raw }}</p>
           {% if not mensaje.getAdjunto() is empty %}
-          <p><a href="{{ruta}}" download>{{mensaje.getAdjunto()}}</a></p>
+          <p><a href="{{ mensaje.getAdjunto() }}" download="">{{mensaje.getAdjunto()}}</a></p>
           {% endif %}
         </div>
       </div>
