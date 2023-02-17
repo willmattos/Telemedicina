@@ -272,7 +272,7 @@ class Metodos extends AbstractController{
                             );
                         }
                         $extension = pathinfo($nombre, PATHINFO_EXTENSION);
-                        $mover = move_uploaded_file($cv, $directorio . "/$nombre." . $extension);
+                        $mover = move_uploaded_file($cv, $directorio . "/$nombre");
                 }
                 }
                 $entityManager->flush();
