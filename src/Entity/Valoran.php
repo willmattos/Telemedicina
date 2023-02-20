@@ -35,8 +35,8 @@ class Valoran
     public function getCodigo() {
         return $this->codigo_consulta;
     }
-    public function setCodigo($codigo) {
-       $this->codigo = $codigo;
+    public function setCodigo($codigo_consulta) {
+       $this->codigo_consulta = $codigo_consulta;
     }
     public function getNumCol() {
         return $this->num_medico;
@@ -45,7 +45,7 @@ class Valoran
         $this->num_medico = $num_medico;
     }
     public function getIdUsuario() {
-        return $this->num_medico;
+        return $this->id_usuario;
     }
     public function setIdUsuario($id_usuario) {
         $this->id_usuario = $id_usuario;

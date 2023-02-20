@@ -333,3 +333,9 @@ h1 a:active,
 .actualizar>*{
   margin: 1ex;
 }
+.contenedor_mensajes img{
+  width: 100%;
+}
+.leido dt{
+  font-weight: bold;
+}

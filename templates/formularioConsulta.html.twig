@@ -59,7 +59,7 @@
 </script>
 {% endblock %} {% block consulta %}
 <div class="nueva_consulta">
-<form action="{{ path('crear_consulta') }}" method="post">
+<form action="{{ path('crear_consulta') }}" method="post" enctype="multipart/form-data">
   <table>
     <tr>
       <th colspan="2">Nueva Consulta</th>
@@ -80,7 +80,7 @@
     </tr>
     <tr>
       <td><label for="adjuntar">Adjuntar</label></td>
-      <td><input type="file" name="adjunto" /></td>
+      <td><input type="file" name="fichero" /></td>
     </tr>
     <tr>
       <td><label for="especialidad">Especialidad</label></td>

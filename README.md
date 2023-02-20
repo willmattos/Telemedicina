@@ -24,7 +24,7 @@ https://github.githistory.xyz/
 
 --------------------------------------------------------------------
 
-fallo en consultas multiples
+hecho//fallo en consultas multiples
 hecho// archivos en creacion de consulta
 registro @comem
 perfil medicos

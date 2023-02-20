@@ -37,8 +37,17 @@
     <li>
       Perfil
       <a href="{{ path('perfil') }}">
-              <span class=" link"></span>
+        <span class=" link"></span>
       </a>
     </li>
+    {% if is_granted('ROLE_USER') %}
+    <li>
+      Salir
+      <a href="{{ path('ctrl_logout') }}">
+        <span class=" link"></span>
+      </a>
+    </li>
+    {%endif%}
+
   </ul>
 </div>

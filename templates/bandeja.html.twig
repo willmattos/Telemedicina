@@ -24,7 +24,8 @@
           url = url.replace("codigo", element[0]);
           a.setAttribute("href", url);
           span.setAttribute("class", "link");
-          if (element[3]) {
+          console.log(element);
+          if (!element[4]) {
             div.setAttribute("class", "leido");
           }
           $(".contenedor_consultas").append(div);

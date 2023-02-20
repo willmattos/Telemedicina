@@ -30,16 +30,21 @@
   <div>
     <div class="mitad">
       {% if mensajes.0.getConsulta().getCompletado() == 0 %}
-      <button class="button-24" role="button">Finalizar consulta</button>
-      {% elseif valoracion == 0 %}
-      <label for="">Puntuación:</label><select name="puntos" id="">
-        <option value="" selected>1</option>
-        <option value="">2</option>
-        <option value="">3</option>
-        <option value="">4</option>
-        <option value="">5</option>
-      </select>
-      {% else %}
+      <form action="{{path('finconsulta', {'consulta':consulta.getCodigo()})}}" method="post">
+        <button class="button-24" role="button" type="submit">Finalizar consulta</button>
+      </form>
+      {% elseif valoracion == 0 and mensajes.0.getConsulta().getUsuario().getId() == app.user.getId()%}
+      <form action="{{path('puntuarconsulta', {'consulta':consulta.getCodigo()})}}" method="post">
+        <label for="">Puntuación:</label><select name="puntos" id="">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <button id="" class="button-13" type="submit">Enviar</button>
+      </form>
+      {% elseif valoracion != 0 %}
       <p>Puntuación: {{ valoracion }}</p>
       {%endif%}
     </div>
@@ -56,12 +61,17 @@
         <div>
           <p>{{ mensaje.getMensaje()|striptags('<p>')|raw }}</p>
           {% if not mensaje.getAdjunto() is empty %}
-          <p><a href="{{ mensaje.getAdjunto() }}" download="">{{mensaje.getAdjunto()}}</a></p>
+              {% if not mensaje.getFecha() is null %}
+              <p><a href="{{ mensaje.getRuta() }}" download="">{{mensaje.getAdjunto()}}</a></p>
+              {% else %}
+              <p><img src="{{ mensaje.getRuta() }}" alt=""></p>
+              {% endif %}
           {% endif %}
         </div>
       </div>
       {% endfor %}
     </div>
+    {% if mensajes.0.getConsulta().getCompletado() == 0 %}
     <div class="envio_mensaje">
       <form enctype="multipart/form-data" action="{{path('enviarMensaje', {'consulta':consulta.getCodigo()})}}" method="post">
         <textarea maxlength="200" class="mensaje" name="mensaje" id="" rows="4"
@@ -70,5 +80,6 @@
         <button id="" class="button-13" type="submit">Enviar</button>
       </form>
     </div>
+    {%endif%}
   </div>
   {% endblock %}

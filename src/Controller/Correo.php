@@ -24,63 +24,11 @@ class Correo extends AbstractController{
         return $this->redirectToRoute('bandeja');
         
     }
-    /**
-     * @Route("/enviarcorreo", name="enviarcorreo")	 
-     */
-	public function enviarCorreo(){  
-        if(!$this->getUser()){
-            if(isset($_POST['nombre']) && $_POST['correo']){
-                $correo = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
-                if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-                    $entityManager = $this->getDoctrine()->getManager();
-                    $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('correo'=> $correo));
-                    if($usuario){
-                        
-                        $usuario->setRecuperacion(rand(1,2147483647));
-
-                        $entityManager->flush();
-                          
-                        $absolute_url = $this->full_url( $_SERVER );
-                        
-                        $ruta = substr($absolute_url, 0, -11);
-                        $ruta = $ruta . "activar/" .$usuario->getRecuperacion();
-                        $email = (new Email())
-                        ->from('noreply@telemedicina.com')
-                        ->to($correo)
-                        //->cc('cc@example.com')
-                        //->bcc('bcc@example.com')
-                        //->replyTo('fabien@example.com')
-                        //->priority(Email::PRIORITY_HIGH)
-                        ->subject('Activar tu cuenta')
-                        ->html("<a href=\"$ruta\">Activar mi cuenta</a>");
-                        $dns='smtp://1d416383922a72:9f46f6c3bc5de4@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
-                        $transport = Transport::fromDsn($dns);
-                        $mailer = new Mailer($transport);
-                        $mailer->send($email);
-                    }else{
-                        return new Response('<html><body>'. $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] .'</body></html>');
-
-                    }
-               
-
-                
-            }
-            else{
-             return new Response('<html><body>correo mals</body></html>');
-            }
-            }else{
-                return new Response('<html><body>falta datos</body></html>');
-            }
-        }else{
-            return new Response('<html><body>ya hay usuario</body></html>');
-        }
-        return new Response('<html><body>Enviado</body></html>');     
-	 }
 
 	 /**
      * @Route("/crearcuenta", name="crearcuenta")	 
      */
-	public function crear(UserPasswordHasherInterface $passwordHasher){  
+	public function crear(UserPasswordHasherInterface $passwordHasher,MailerInterface $mailer){  
         if(!$this->getUser()){
             if(isset($_POST['nombre']) && isset($_POST['apellido']) && isset($_POST['correo']) && isset($_POST['clave']) && $_POST['nombre'] && $_POST['apellido'] && $_POST['correo'] && $_POST['clave']){
                 $correo = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
@@ -117,33 +65,23 @@ class Correo extends AbstractController{
                         //->priority(Email::PRIORITY_HIGH)
                         ->subject('Activa tu cuenta')
                         ->html("<a href=\"$ruta\">Activar mi cuenta</a>");
-                        $dns='smtp://1d416383922a72:9f46f6c3bc5de4@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
-                        $transport = Transport::fromDsn($dns);
-                        $mailer = new Mailer($transport);
                         $mailer->send($email);
                     }else{
-                        return new Response('<html><body>'. $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] .'</body></html>');
-
+                        return $this->render('mensaje.html.twig', array('mensaje' => 'Un usuario ya esta registrado con ese correo.'));
                     }
                
 
                 
             }
             else{
-             return new Response('<html><body>correo mals</body></html>');
-
+                return $this->render('mensaje.html.twig', array('mensaje' => 'Correo electronico no valido.'));
             }
             }else{
-                return new Response('<html><body>falta datos</body></html>');
-
+                return $this->render('mensaje.html.twig', array('mensaje' => 'No se completaron todos los datos.'));
             }
         }else{
-            return new Response('<html><body>ya hay usuario</body></html>');
-
-        }
-        return new Response('<html><body>Enviado</body></html>');
-
-            
+            return $this->redirectToRoute('bandeja');
+        }   
 	 }
          /**
      * @Route("/activar/{codigo}", name="activar")
@@ -197,9 +135,6 @@ class Correo extends AbstractController{
                         //->priority(Email::PRIORITY_HIGH)
                         ->subject('R tu cuenta')
                         ->html("<a href=\"$ruta\">Activar mi cuenta</a>");
-                        $dns='smtp://1d416383922a72:9f46f6c3bc5de4@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
-                        $transport = Transport::fromDsn($dns);
-                        $mailer = new Mailer($transport);
                         $mailer->send($email);
                     }else{
                         return new Response('<html><body>'. $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] .'</body></html>');

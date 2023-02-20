@@ -32,32 +32,6 @@ use App\Entity\Valoran;
 
 class Metodos extends AbstractController{
 
-   /**
-     * @Route("/ejemplo", name="ejemplo")
-     */
-    public function ejemplo() {
-        //$usuario = $this->getUser();
-        //var_dump($usuario->getId());die;
-        try {
-            $filesystem = new Filesystem();
-            $finder = new Finder();
-            $directorio = dirname(__FILE__);
-            $usuario = $this->getUser();
-            $filesystem->exists($directorio.'/../../public/Usuarios/'.$usuario->getId());
-            if(is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId())){
-                    echo null;
-            }else{
-                echo("Hola");
-                $filesystem->mkdir(
-                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId()),
-                );
-            } 
-           }
-           catch (IOExceptionInterface $exception) {
-            echo "An error occurred while creating your directory at ".$exception->getPath();
-        }
-        return $this->render('bandeja.html.twig');   
-    }
     /**
      * @Route("/bandeja", name="bandeja")
      */
@@ -114,13 +88,9 @@ class Metodos extends AbstractController{
             return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades, 'cv' =>$rutaP));
         }
         }
-        return $this->redirectToRoute('bandeja');
-
-        
+        return $this->redirectToRoute('bandeja');        
     }
-
-
-        
+   
     /**
      * @Route("/bandeja/nueva_consulta", name="formularioConsulta")
      */
@@ -155,6 +125,12 @@ class Metodos extends AbstractController{
                     $foto = $consulta->getMedico()->getUsuario()->getFoto();
                 }
                 $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
+
+                if($mensajes[count($mensajes)-1]->getUsuario()->getId() != $this->getUser()->getId()){
+                    $consulta->setLeido(1);
+                    $entityManager->flush();
+                }
+
                 foreach ($mensajes as $mensaje) {
                     $mensaje->setMensaje(str_replace("\n", '</p><p>', $mensaje->getMensaje()));
                     if($mensaje->getAdjunto()){
@@ -169,13 +145,22 @@ class Metodos extends AbstractController{
                         $borrar = "bandeja/consulta/$idconsulta";
                         $ruta = substr($absolute_url, 0, -1*strlen($borrar));
                         $directorio = $ruta . "Usuarios/u$id/$codconsulta/men$codmensaje";
+                        $mensaje->setRuta($directorio . "/$ficheroname");
+                        
                         $extension = pathinfo($mensaje->getAdjunto(), PATHINFO_EXTENSION);
-                        $mensaje->setAdjunto($directorio . "/$ficheroname");
+                        $extension = strtolower($extension);
+                        if($extension == 'jpg' || $extension == 'png' || $extension == 'gif' || $extension == 'jpeg' || $extension == 'svg' || $extension == 'tiff' || $extension == 'ico'){
+                           $mensaje->setFecha(null); 
+                        }
                     }
                 }
                 $datos = $nombre . " " . $apellido . ": " . $consulta->getAsunto();
-                $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo())) || 0;
-                if($valoracion) $valoracion = $valoracion->getValoracion();
+                $valoracion = $entityManager->getRepository(Valoran::class)->findOneBy(array('codigo_consulta'=>$consulta->getCodigo()));
+                if($valoracion){
+                    $valoracion = $valoracion->getValoracion();
+                }else{
+                    $valoracion = 0;
+                } 
                 return $this->render('consulta.html.twig',array('datos' => $datos, 'mensajes' => $mensajes,'valoracion' => $valoracion, 'consulta' => $consulta, 'foto' => $foto));
             }
         }
@@ -194,25 +179,68 @@ class Metodos extends AbstractController{
                 $entityManager = $this->getDoctrine()->getManager();
                
                 //Creamos la consulta
-                $consulta = new Consulta();
-                $consulta->setAsunto($_POST['asunto']);
-                $consulta->setLeido(0);
-                $consulta->setCompletado(0);
-                $consulta->setUsuario($this->getUser());
-                $consulta->setMedico($entityManager->find(Medico::class,$medico));
-                $entityManager->persist($consulta);
+                $consulta_nueva = new Consulta();
+                $consulta_nueva->setAsunto($_POST['asunto']);
+                $consulta_nueva->setLeido(0);
+                $consulta_nueva->setCompletado(0);
+                $consulta_nueva->setUsuario($this->getUser());
+                $consulta_nueva->setMedico($entityManager->find(Medico::class,$medico));
+                $entityManager->persist($consulta_nueva);
                 
                 //Creamos el mensaje
                 $mensaje = new Mensaje();
                 $mensaje->setMensaje($_POST['mensaje']);
-                if(isset($_FILES['adjunto'])){
-                    $mensaje->setAdjunto($_FILES['adjunto']);
-                }
-                $mensaje->setConsulta($consulta);
+                $mensaje->setConsulta($consulta_nueva);
                 $mensaje->setUsuario($this->getUser());
                 $entityManager->persist($mensaje);
+
                 $entityManager->flush();
-                $consulta = $consulta->getCodigo();
+                if(isset($_FILES['fichero']) && $_FILES['fichero']){
+                    $usuario = $this->getUser();
+
+
+                    $mensaje->setAdjunto($_FILES['fichero']['name']);
+                    $cv = $_FILES['fichero']['tmp_name'];
+                    $nombre = $_FILES['fichero']['name'];
+                    $filesystem = new Filesystem();
+                        $directory = dirname(__FILE__);
+                        $id = $usuario->getId();
+                        $consulta = "con" . $mensaje->getConsulta()->getCodigo();
+                        $codmensaje = $mensaje->getCodigo();
+                        $directorio = $directory . "/../../public/Usuarios/u$id";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
+                        }
+                        $directorio = $directory . "/../../public/Usuarios/u$id/$consulta";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
+                        }
+                        $directorio = $directory . "/../../public/Usuarios/u$id/$consulta";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
+                        }
+                        $directorio = $directory . "/../../public/Usuarios/u$id/$consulta/men$codmensaje";
+                        $ruta = $filesystem->exists($directorio);
+                        if(!$ruta){
+                            $filesystem->mkdir(
+                                Path::normalize($directorio),
+                            );
+                        }
+                        $extension = pathinfo($nombre, PATHINFO_EXTENSION);
+                        $mover = move_uploaded_file($cv, $directorio . "/$nombre");
+                }
+                
+                $entityManager->flush();
+                $consulta = $consulta_nueva->getCodigo();
             }
             
         }
@@ -231,6 +259,9 @@ class Metodos extends AbstractController{
                 $mensaje->setUsuario($entityManager->find(Usuario::class,$this->getUser()->getId()));
                 $entityManager->persist($mensaje);
                 $entityManager->flush();
+
+                $mensaje->getConsulta()->setFecha($mensaje->getFecha());
+                $mensaje->getConsulta()->setLeido(0);
 
                 if($_POST['mensaje']){
                     $mensaje->setMensaje($_POST['mensaje']);
@@ -282,6 +313,49 @@ class Metodos extends AbstractController{
         }
         return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
     }
+
+     /**
+     * @Route("/finconsulta", name="finconsulta")
+     */
+    public function cerrarConsulta() {
+            if($this->isGranted('ROLE_USER')){
+                $entityManager = $this->getDoctrine()->getManager();
+                $consulta = $entityManager->getRepository(Consulta::class)->findOneBy(array('codigo'=>$_GET['consulta']));
+                if($consulta){
+                    if(($consulta->getUsuario()->getId() == $this->getUser()->getId()) || ($consulta->getMedico()->getUsuario()->getId() == $this->getUser()->getId())){
+                        $consulta->setCompletado(1);
+                        $entityManager->flush();
+                      }
+                }
+                }
+        return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
+    }
+
+    /**
+     * @Route("/puntuarconsulta", name="puntuarconsulta")
+     */
+    public function puntuarConsulta() {
+        if($this->isGranted('ROLE_USER')){
+            $entityManager = $this->getDoctrine()->getManager();
+            $consulta = $entityManager->getRepository(Consulta::class)->findOneBy(array('codigo'=>$_GET['consulta']));
+            if($consulta){
+                if(($consulta->getUsuario()->getId() == $this->getUser()->getId())){
+                    if(isset($_POST['puntos']) && $_POST['puntos']){
+                        if(1 <= $_POST['puntos'] && $_POST['puntos'] <= 5){
+                            $valoracion = new Valoran();
+                            $valoracion->setValoracion($_POST['puntos']);
+                            $valoracion->setCodigo($consulta->getCodigo());
+                            $valoracion->setNumCol($consulta->getMedico()->getNumCol());
+                            $valoracion->setIdUsuario($this->getUser()->getId());
+                            $entityManager->persist($valoracion);
+                            $entityManager->flush();
+                        }
+                    }
+                  }
+            }
+            }
+    return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
+}
 
      /**
      * @Route("/bandeja/actualizarDatos", name="actualizarDatos")
@@ -350,6 +424,14 @@ class Metodos extends AbstractController{
                 $consultas = $entityManager->getRepository(Consulta::class)->findBy(array('usuario'=>$this->getUser()), array('fecha' => 'DESC'));
             }
             foreach ($consultas as $consulta) {
+
+            $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
+
+            if(!$consulta->getLeido() && $mensajes[count($mensajes)-1]->getUsuario()->getId() != $this->getUser()->getId()){
+                $consulta->setLeido(0);
+            }else{
+                $consulta->setLeido(1);
+            }
             # code...
             if($medico){
                 $nombre = $consulta->getUsuario()->getNombre();
@@ -397,21 +479,13 @@ class Metodos extends AbstractController{
     
     }
 
-    /**
-     * @Route("/foto", name="foto", methods={"GET"})
-     */
-    /*    public function testAction(){   
-            $entityManager = $this->getDoctrine()->getManager();
-            $usuario = $entityManager->find(Usuario::class,4);
-            $file = $usuario->getFoto();              
-            $response = new Response(base64_decode($file), 200, array(
-                    'Content-Type' => 'application/octet-stream',
-                    'Content-Disposition' => 'attachment; filename="fotoperfil.jpg"'
-            ));
-            
-            return $response; 
-        }
-    */
+
+
+
+
+
+
+    
 //Funciones
 
     //Funcion para crear la carpeta de usuario y dentro de el la de chats
@@ -457,13 +531,6 @@ class Metodos extends AbstractController{
            catch (IOExceptionInterface $exception) {
             echo "An error occurred while creating your directory at ".$exception->getPath();
         }
-    }
-    private function quitar_acentos($cadena){
-        $originales = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿ';
-        $modificadas = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyyby';
-        $cadena = utf8_decode($cadena);
-        $cadena = strtr($cadena, utf8_decode($originales), $modificadas);
-        return str_replace(' ', '', utf8_encode($cadena));
     }
 
    private function url_origin($s, $use_forwarded_host=false) {

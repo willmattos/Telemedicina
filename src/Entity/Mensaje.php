@@ -40,6 +40,8 @@ class Mensaje
      * @ORM\JoinColumn(name="id_usuario", referencedColumnName="id")
      */
     private $id_usuario;
+
+    private $ruta;
 	
     public function getCodigo() {
         return $this->codigo;
@@ -74,5 +76,10 @@ class Mensaje
     public function setUsuario($id_usuario) {
         $this->id_usuario = $id_usuario;
     }
-
+    public function getRuta() {
+        return $this->ruta;
+    }
+    public function setRuta($ruta) {
+        $this->ruta = $ruta;
+    }
 }
