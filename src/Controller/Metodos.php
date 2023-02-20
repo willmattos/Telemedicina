@@ -189,6 +189,7 @@ class Metodos extends AbstractController{
      */
     public function crearConsulta() {
         if(isset($_POST['asunto'] ) && isset($_POST['mensaje']) && isset($_POST['medicos']) && $_POST['asunto'] && $_POST['mensaje'] && $_POST['medicos']){
+            //var_dump($_POST['medicos']);die;
             foreach($_POST['medicos'] as $medico){
                 $entityManager = $this->getDoctrine()->getManager();
                
@@ -198,7 +199,7 @@ class Metodos extends AbstractController{
                 $consulta->setLeido(0);
                 $consulta->setCompletado(0);
                 $consulta->setUsuario($this->getUser());
-                $consulta->setMedico($entityManager->find(Medico::class,$_POST['medicos'][0]));
+                $consulta->setMedico($entityManager->find(Medico::class,$medico));
                 $entityManager->persist($consulta);
                 
                 //Creamos el mensaje
@@ -213,6 +214,7 @@ class Metodos extends AbstractController{
                 $entityManager->flush();
                 $consulta = $consulta->getCodigo();
             }
+            
         }
         return $this->redirectToRoute('consulta', array('consulta' => $consulta));
     }
