@@ -9,3 +9,6 @@
 src/.DS_Store
 src/Entity/.DS_Store
 .DS_Store
+src/Controller/Correo.php
+src/Controller/Correo.php
+*.php

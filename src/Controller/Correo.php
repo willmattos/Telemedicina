@@ -83,7 +83,7 @@ class Correo extends AbstractController{
                         //->priority(Email::PRIORITY_HIGH)
                         ->subject('Recupera tu cuenta')
                         ->html("<a href=\"$ruta\">Activar mi cuenta</a>");
-                        $dns='smtp://537b291161b1d5:69f08f99c0af5d@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
+                        $dns='smtp://1d416383922a72:9f46f6c3bc5de4@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
                         $transport = Transport::fromDsn($dns);
                         $mailer = new Mailer($transport);
                         $mailer->send($email);
@@ -97,19 +97,14 @@ class Correo extends AbstractController{
             }
             else{
              return new Response('<html><body>correo mals</body></html>');
-
             }
             }else{
                 return new Response('<html><body>falta datos</body></html>');
-
             }
         }else{
             return new Response('<html><body>ya hay usuario</body></html>');
-
         }
-        return new Response('<html><body>Enviado</body></html>');
-
-            
+        return new Response('<html><body>Enviado</body></html>');     
 	 }
 
 	 /**
@@ -172,7 +167,7 @@ class Correo extends AbstractController{
                         //->priority(Email::PRIORITY_HIGH)
                         ->subject('Activa tu cuenta')
                         ->html("<a href=\"$ruta\">Activar mi cuenta</a>");
-                        $dns='smtp://537b291161b1d5:69f08f99c0af5d@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
+                        $dns='smtp://1d416383922a72:9f46f6c3bc5de4@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login';
                         $transport = Transport::fromDsn($dns);
                         $mailer = new Mailer($transport);
                         $mailer->send($email);
