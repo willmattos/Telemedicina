@@ -143,7 +143,10 @@ class Correo extends AbstractController{
         }else{
             return new Response('<html><body>Ya hay usuario</body></html>');
         }
-        return new Response('<html><body>Enviado</body></html>');     
+        return new Response('<html><body><div class="conten">
+        <h1>Mira tu bandeja de correos.</h1>
+        <p>El correo de verificacion ha sido enviado</p>
+      </div></body></html>');     
 	 }
 
  /**
