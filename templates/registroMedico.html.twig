@@ -1,0 +1,45 @@
+{# templates/registroMedico.html.twig #}
+{% extends 'base.html.twig' %}
+{% block contenido %}  
+      <div class="conten">
+        <div class="login">
+		<form action="" method="post" enctype="multipart/form-data">
+          <table>
+            <tr><td colspan="2">Termina de completar tus datos</td></tr>
+            <tr>
+                <td><label for="">Número de Colegiado:</label></td>
+                <td><input type="text" id="colegiado" name="colegiado" maxlength="9"/></td>
+            </tr>
+            <tr>
+                <td><label for="">Especialidad:</label></td>
+                <td>
+                    <select name="especialidad" id="especialidad">
+                      <option value="" selected>--</option>
+                      {% for especialidad in especialidades %}
+                      <option value="{{ especialidad.codigo }}">
+                        {{ especialidad.nombre }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+              <td><label for="">Hospital:</label></td>
+              <td><input type="text" id="hospital" name="hospital" /></td>
+            </tr>
+            <tr>
+              <td><label for="">Curriculum:</label></td>
+              <td><input type="password" id="cv" name="cv"/></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button id="button-25" class="button-24" role="button" type="submit">
+                  Registrarse
+                </button>
+              </td>
+            </tr>
+          </table>
+		  </form>
+        </div>
+      </div>
+{% endblock %}

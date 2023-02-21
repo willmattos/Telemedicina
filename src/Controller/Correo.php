@@ -10,6 +10,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use App\Entity\Usuario;
 
 class Correo extends AbstractController{
@@ -69,8 +70,6 @@ class Correo extends AbstractController{
                     }else{
                         return $this->render('mensaje.html.twig', array('mensaje' => 'Un usuario ya esta registrado con ese correo.'));
                     }
-               
-
                 
             }
             else{
@@ -82,6 +81,8 @@ class Correo extends AbstractController{
         }else{
             return $this->redirectToRoute('bandeja');
         }   
+        return $this->render('mensaje.html.twig', array('mensaje' => "Se ha enviado un correo de verificación a $correo."));
+
 	 }
          /**
      * @Route("/activar/{codigo}", name="activar")
@@ -92,13 +93,15 @@ class Correo extends AbstractController{
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $codigo));
             if($usuario){
-                $usuario->setRecuperacion(null);
-                $usuario->setActivado(1);
-                $entityManager->flush();
-
+                    $usuario->setRecuperacion(0);
+                    $usuario->setActivado(1);
+                    $entityManager->flush();
+                    $token = new UsernamePasswordToken($usuario, null, 'main', $usuario->getRoles());
+                    $this->get('security.token_storage')->setToken($token);
+                    $this->get('session')->set('_security_main', serialize($token));
             }
         }
-        return $this->redirectToRoute('ctrl_login');
+        return $this->redirectToRoute('bandeja');
     }
     /**
      * @Route("/recuperar", name="recuperar")
