@@ -114,19 +114,23 @@ class Correo extends AbstractController{
         
     }
     /**
-     * @Route("/enviarcorreoRecuperacion", name="enviarcorreoRecuperacion")	 
+     * @Route("/recuperarCuenta", name="recuperarCuenta")	 
      */
 	public function enviarCorreoRecuperacion(MailerInterface $mailer){  
         if(!$this->getUser()){
-            if($_POST['correo']){
+            if(isset($_POST['correo']) && $_POST['correo']){
                 $correo = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
                 if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                     $entityManager = $this->getDoctrine()->getManager();
                     $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('correo'=> $correo));
                     if($usuario){
+                        $usuario->setRecuperacion(rand(1,2147483647));
+                        $entityManager->flush();
+                    
                         $absolute_url = $this->full_url( $_SERVER );
-                        $ruta = $absolute_url;
-                        $ruta = $ruta . "/cambiar/".$usuario->getId();
+                        
+                        $ruta = substr($absolute_url, 0, -15);
+                        $ruta = $ruta . "cambiarclave/" .$usuario->getRecuperacion();
                         $email = (new Email())
                         ->from('noreply@telemedicina.com')
                         ->to($correo)
@@ -134,39 +138,44 @@ class Correo extends AbstractController{
                         ->html("<a href=\"$ruta\">Cambiar contraseña</a>");
                         $mailer->send($email);
                     }else{
-                        return new Response('<html><body>'. $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] .'</body></html>');
-                    }  
-            }
-            else{
-             return new Response('<html><body>correo mals</body></html>');
-            }
+                        return $this->render('mensaje.html.twig', array('mensaje' => "El correo $correo no está registrado a ningún usuario."));
+                    } 
             }else{
-                return new Response('<html><body>Falta datos</body></html>');
-            }
-        }else{
-            return new Response('<html><body>Ya hay usuario</body></html>');
+                return $this->render('mensaje.html.twig', array('mensaje' => "Ha ocurrido un error, por favor inténtelo de nuevo más tarde."));
+            }  
         }
-        return new Response('<html><body><div class="conten">
-        <h1>Mira tu bandeja de correos.</h1>
-        <p>El correo de verificacion ha sido enviado</p>
-      </div></body></html>');     
+        }
+        return $this->render('mensaje.html.twig', array('mensaje' => "Se ha enviado un correo a $correo."));
 	 }
 
  /**
-     * @Route("/enviarcorreoRecuperacion/cambiar/{id}", name="cambiar")
+     * @Route("/cambiarclave/{recuperacion}", name="cambiarclave")
      */
-    public function cambiar($id) {
-            return $this->render('cambiarContraseña.html.twig', array('id' => $id));
+    public function cambiar($recuperacion) {
+        if(!$this->getUser()){
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $recuperacion));
+            if($usuario){
+                return $this->render('cambiarContraseña.html.twig', array('recuperacion' => $recuperacion));
+            }else{
+                return $this->redirectToRoute('ctrl_login');        
+            }
+        }
+        return $this->redirectToRoute('bandeja');
+           
     }
     /**
-     * @Route("/enviarcorreoRecuperacion/cambiarContraseña", name="cambiarContraseña")
+     * @Route("/cambioclave/{codigo}", name="cambioclave")
      */
-    public function cambiarContraseña(UserPasswordHasherInterface $passwordHasher) {
+    public function cambiarContraseña($codigo ,UserPasswordHasherInterface $passwordHasher) {
         $entityManager = $this->getDoctrine()->getManager();
-        $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('id'=> $_POST['oculto']));
+        $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $codigo));
         $hashedPassword = $passwordHasher->hashPassword($usuario,$_POST['clave']);
         $usuario->setClave($hashedPassword);
         $entityManager->flush();
+        $token = new UsernamePasswordToken($usuario, null, 'main', $usuario->getRoles());
+                    $this->get('security.token_storage')->setToken($token);
+                    $this->get('session')->set('_security_main', serialize($token));
        return $this->redirectToRoute('bandeja');
 }
      function url_origin($s, $use_forwarded_host=false) {

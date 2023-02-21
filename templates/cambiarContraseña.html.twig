@@ -3,7 +3,7 @@
 {% block contenido %}  
       <div class="conten">
         <div class="login">
-		<form action="{{ path('cambiarContraseña') }}" onsubmit=" return validacion()" method="post">
+		<form action="{{ path('cambioclave', {'codigo': recuperacion } ) }}" onsubmit=" return validacion()" method="post">
           <table>
               <td><label for="">Nueva Contraseña:</label></td>
               <td><input type="password" id="clave" name="clave"/></td>
@@ -11,7 +11,6 @@
             <tr>
                 <td><label for="">Repita contraseña:</label></td>
                 <td><input type="password" id="clave1" name="clave1"/></td>
-                <input type="hidden" id="oculto" name="oculto" value="{{id}}">
                 <tr><td colspan="2" ><input type="submit" id="button-25" class="button-24" value="Cambiar Contraseña"/></td></tr>
               </tr>
           </table>
