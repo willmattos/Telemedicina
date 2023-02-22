@@ -156,9 +156,9 @@ class Correo extends AbstractController{
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $recuperacion));
             if($usuario){
+                $usuario->setActivado(1);
+                $entityManager->flush();
                 return $this->render('cambiarContraseña.html.twig', array('recuperacion' => $recuperacion));
-            }else{
-                return $this->redirectToRoute('ctrl_login');        
             }
         }
         return $this->redirectToRoute('bandeja');
@@ -170,13 +170,17 @@ class Correo extends AbstractController{
     public function cambiarContraseña($codigo ,UserPasswordHasherInterface $passwordHasher) {
         $entityManager = $this->getDoctrine()->getManager();
         $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $codigo));
-        $hashedPassword = $passwordHasher->hashPassword($usuario,$_POST['clave']);
-        $usuario->setClave($hashedPassword);
-        $entityManager->flush();
-        $token = new UsernamePasswordToken($usuario, null, 'main', $usuario->getRoles());
-                    $this->get('security.token_storage')->setToken($token);
-                    $this->get('session')->set('_security_main', serialize($token));
-       return $this->redirectToRoute('bandeja');
+            if($usuario){
+                $hashedPassword = $passwordHasher->hashPassword($usuario,$_POST['clave']);
+                $usuario->setClave($hashedPassword);
+                $usuario->setRecuperacion(0);
+                $entityManager->flush();
+                $token = new UsernamePasswordToken($usuario, null, 'main', $usuario->getRoles());
+                $this->get('security.token_storage')->setToken($token);
+                $this->get('session')->set('_security_main', serialize($token));
+            }
+            return $this->redirectToRoute('bandeja');
+        
 }
      function url_origin($s, $use_forwarded_host=false) {
 
