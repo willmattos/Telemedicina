@@ -112,8 +112,8 @@ class Metodos extends AbstractController{
         }else{
             $filesystem = new Filesystem();
             $directorio = dirname(__FILE__);
-            $rutaF = $directorio.'/../../public/Usuarios/u'.$this->getUser()->getId().'/cv/'.'curriculum.pdf';
-            $rutaP = 'Usuarios/u'.$this->getUser()->getId().'/cv/'.'curriculum.pdf';
+            $rutaF = $directorio.'/../../public/Usuarios/u'.$this->getUser()->getId().'/cv/'.$medico->getCV();
+            $rutaP = 'Usuarios/u'.$this->getUser()->getId().'/cv/'.$medico->getCV();
             $ruta = $filesystem->exists($rutaF);
             if(!$ruta){
                 $rutaP= null;
@@ -415,19 +415,15 @@ class Metodos extends AbstractController{
                 $directorio = dirname(__FILE__);
 
                 if($cv){
+                    $medico->setCV($nombre);
                     $filesystem = new Filesystem();
                     $directorio = dirname(__FILE__);
                     $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
-                    if($ruta){
-                        //Mete el curriculum en la carpeta
-                        $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
-                        $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
-                    }else{
-                        $this->comprobarcarpetaCv($usuario);
-                        //Mete el curriculum en la carpeta
-                        $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf';
-                        $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.'curriculum.pdf');
+                    if(!$ruta){
+                        $this->comprobarcarpetaCv($usuario);    
                     }
+                    $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre;
+                    $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre);
                 }
             }
             //En la tabla usuario
@@ -441,6 +437,35 @@ class Metodos extends AbstractController{
         }
         return $this->redirectToRoute('perfil');
     }
+
+    /**
+     * @Route("/medico/{colegiado}", name="medico")
+     */
+    public function perfilMedico($colegiado) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('num_col'=>$colegiado));
+            if($medico){
+                if(!$medico->getUsuario()->getFoto()){
+                    $medico->getUsuario()->setFoto(null);
+                }
+                if($medico->getCV()){
+                    $filesystem = new Filesystem();
+                    $directorio = dirname(__FILE__);
+                    $rutaF = $directorio.'/../../public/Usuarios/u'.$medico->getUsuario()->getId().'/cv/'.'curriculum.pdf';
+                    $rutaP = 'Usuarios/u'.$medico->getUsuario()->getId().'/cv/'.'curriculum.pdf';
+                    $ruta = $filesystem->exists($rutaF);
+                    if(!$ruta){
+                        $medico->setCV(null);
+                    }else{
+                        $medico->setCV($rutaP);
+                    }
+                }else{
+                    $medico->setCV(null);
+                }
+            return $this->render('perfilMedico.html.twig',array('medico' => $medico));
+            }
+            return $this->redirectToRoute('medicos');
+}
     
     //LO QUE NO SEA AJAX VA ARRIBA
     //AQUI EMPEZAMOS AJAX
