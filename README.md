@@ -41,6 +41,7 @@ Cuando el usuario quiere volver a clickar la url del gmail cuando ya se ha regis
 
 Cuando se cambia la contraseña hay que cambiar el numero de recuperacion a 0 otra vez.
 
+Cuando un archivo es muy grande no funciona.
 
 
 --------Meter en el cmd----------

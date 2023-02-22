@@ -36,9 +36,35 @@ class Metodos extends AbstractController{
      * @Route("/remedico", name="remedico")
      */
     public function remedico() {
-
-       var_dump($_REQUEST);die;
-        return $this->redirectToRoute('ctrl_login');
+        var_dump($_FILES);
+        var_dump($_POST);die;
+        if(!isset($_FILES['cv'])){
+            if($this->isGranted('ROLE_USER')){
+                if($especialidades = $this->comprobarMedico()){
+                    return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades, 'error'=>true));
+                }
+            }
+        }
+        
+        if(isset($_FILES)){
+            if($_FILES['cv']['name'] == ''){
+                if($this->isGranted('ROLE_USER')){
+                    if($especialidades = $this->comprobarMedico()){
+                        return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades, 'error'=>true));
+                    }
+                } 
+            }
+            if(isset($_POST)){
+                $mensaje = new Medico();
+                $mensaje->setNumCol($_POST['colegiado']);
+                $mensaje->setEspecialidad($_POST['especialidad']);
+                $mensaje->setHospital($_POST['hospital']);
+                $mensaje->setCV($_FILES['cv']['name']);
+                $mensaje->setsuario($this->getId());
+                $entityManager->persist($mensaje);
+            }
+        }
+        return $this->redirectToRoute('perfil');
     }
 
     /**
@@ -88,7 +114,7 @@ class Metodos extends AbstractController{
     public function medicos() {
         $entityManager = $this->getDoctrine()->getManager();
         $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
-        return $this->render('medicos.html.twig',array('especialidades' => $especialidades));
+        return $this->render('medicos.html.twig',array('especialidades' => $especialidades, 'error'=>false));
     }
 
     /**
@@ -97,8 +123,8 @@ class Metodos extends AbstractController{
     public function perfil() {
         if($this->isGranted('ROLE_USER')){
             if($especialidades = $this->comprobarMedico()){
-                return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades));
-                }
+                return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades, 'error'=>false));
+            }
         $entityManager = $this->getDoctrine()->getManager();
         $usuario = $this->getUser();
         $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
