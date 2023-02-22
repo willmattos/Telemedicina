@@ -36,8 +36,8 @@ class Metodos extends AbstractController{
      * @Route("/remedico", name="remedico")
      */
     public function remedico() {
-        var_dump($_FILES);
-        var_dump($_POST);die;
+        //var_dump($_FILES);
+        //var_dump($_POST);die;
         if(!isset($_FILES['cv'])){
             if($this->isGranted('ROLE_USER')){
                 if($especialidades = $this->comprobarMedico()){
@@ -55,13 +55,27 @@ class Metodos extends AbstractController{
                 } 
             }
             if(isset($_POST)){
-                $mensaje = new Medico();
-                $mensaje->setNumCol($_POST['colegiado']);
-                $mensaje->setEspecialidad($_POST['especialidad']);
-                $mensaje->setHospital($_POST['hospital']);
-                $mensaje->setCV($_FILES['cv']['name']);
-                $mensaje->setsuario($this->getId());
-                $entityManager->persist($mensaje);
+                var_dump($this->getUser()->getId());
+                $usuario = $this->getUser();
+                $entityManager = $this->getDoctrine()->getManager();
+                $medico = new Medico();
+                $medico->setNumCol($_POST['colegiado']);
+                $medico->setEspecialidad($_POST['especialidad']);
+                $medico->setHospital($_POST['hospital']);
+                $medico->setsuario($usuario->getId());
+                $medico->setCV($_FILES['cv']['name']);
+                
+                $cv = $_FILES['cv']['tmp_name'];
+                $filesystem = new Filesystem();
+                $directorio = dirname(__FILE__);
+                $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
+                if(!$ruta){
+                    $this->comprobarcarpetaCv($usuario);    
+                }
+                $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$_FILES['cv']['name'];
+                $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$_FILES['cv']['name']);
+                $entityManager->persist($medico); 
+                $entityManager->flush();   
             }
         }
         return $this->redirectToRoute('perfil');
