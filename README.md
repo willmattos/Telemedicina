@@ -36,7 +36,10 @@ cerrar cuenta
 api publica
 
 ---------------------------------------------------------------------------
+Errores
+Cuando el usuario quiere volver a clickar la url del gmail cuando ya se ha registrado o cambia constraseña sale un error gigante, ya que en la base de datos no hay numero de recuperacion.
 
+Cuando se cambia la contraseña hay que cambiar el numero de recuperacion a 0 otra vez.
 
 
 
