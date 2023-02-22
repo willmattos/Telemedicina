@@ -33,6 +33,15 @@ use App\Entity\Valoran;
 class Metodos extends AbstractController{
 
     /**
+     * @Route("/remedico", name="remedico")
+     */
+    public function remedico() {
+
+       var_dump($_REQUEST);die;
+        return $this->redirectToRoute('ctrl_login');
+    }
+
+    /**
      * @Route("/datosMedico", name="datosMedico")
      */
     public function datosMedico() {
