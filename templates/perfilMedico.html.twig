@@ -1,0 +1,43 @@
+{# templates/bandeja.html.twig #}
+{% extends 'base.html.twig' %}
+{% block contenido %}
+<div class="conten">
+    <table class="perfil">
+      <tr>
+        <td rowspan="6">
+          {% if medico.getUsuario().getFoto() is null %}
+          <img id="consulta_foto" class="consulta_foto" src="{{ asset('default/foto.png')}}" alt="foto perfil" />
+          {% else %}
+          <img id="consulta_foto" class="consulta_foto" src="data:image/png;base64,{{medico.getUsuario().getFoto()}}" alt="foto perfil" />
+          {% endif %}
+        </td>
+        <td>Nombre y Apellidos:</td>
+        <td class="nombre">{{medico.getUsuario().getNombre()}} {{medico.getUsuario().getApellido()}}</td>
+      </tr>
+      <tr>
+        <td>Correo:</td>
+        <td class="correo">{{medico.getUsuario().getCorreo()}}</td>
+      </tr>
+      <tr>
+        <td>Colegiado:</td>
+        <td class="colegiado">{{medico.getNumCol()}}</td>
+      </tr>
+      <tr>
+        <td>Hospital:</td>
+        <td class="hospital">{{medico.getHospital()}}</td>
+      </tr>
+      <tr>
+        <td>Especialidad:</td>
+        <td class="especialidades">{{medico.getEspecialidad().getNombre()}}</td>
+      </tr>
+      {% if not medico.getCV() is null %}
+      <tr>
+        <td>Curriculum:</td>
+        <td id="cv">
+          <a href="{{medico.getCV()}}" download>curriculum</a>
+        </td>
+        </tr>
+    {%endif%}
+    </table>
+</div>
+{% endblock %}
