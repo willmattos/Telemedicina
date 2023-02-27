@@ -40,12 +40,14 @@
 {% block contenido %}
 <div class="conten">
   <div class="contenedor_consultas" id="">
+    {% if app.user.getMedico is null %}
     <div>
       Nueva Consulta
       <a href="{{ path('formularioConsulta') }}">
         <span class="link"></span>
       </a>
     </div>
+    {% endif %}
   </div>
   {% block consulta %} 
   {% endblock %}

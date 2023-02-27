@@ -87,12 +87,12 @@ class Correo extends AbstractController{
          /**
      * @Route("/activar/{codigo}", name="activar")
      */
-    public function activar($codigo) {
+    public function activar($codigo = 0) {
         
         if(!$this->getUser()){
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $codigo));
-            if($usuario){
+            if($usuario && $codigo){
                     $usuario->setRecuperacion(0);
                     $usuario->setActivado(1);
                     $entityManager->flush();
@@ -151,11 +151,12 @@ class Correo extends AbstractController{
  /**
      * @Route("/cambiarclave/{recuperacion}", name="cambiarclave")
      */
-    public function cambiar($recuperacion) {
+    public function cambiar($recuperacion = 0) {
         if(!$this->getUser()){
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $recuperacion));
-            if($usuario){
+            if($usuario && $recuperacion){
+                $usuario->setRecuperacion(0);
                 $usuario->setActivado(1);
                 $entityManager->flush();
                 return $this->render('cambiarContraseña.html.twig', array('recuperacion' => $recuperacion));
@@ -167,10 +168,10 @@ class Correo extends AbstractController{
     /**
      * @Route("/cambioclave/{codigo}", name="cambioclave")
      */
-    public function cambiarContraseña($codigo ,UserPasswordHasherInterface $passwordHasher) {
+    public function cambiarContraseña($codigo = 0 ,UserPasswordHasherInterface $passwordHasher) {
         $entityManager = $this->getDoctrine()->getManager();
         $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $codigo));
-            if($usuario){
+            if($usuario && $codigo){
                 $hashedPassword = $passwordHasher->hashPassword($usuario,$_POST['clave']);
                 $usuario->setClave($hashedPassword);
                 $usuario->setRecuperacion(0);
@@ -182,6 +183,48 @@ class Correo extends AbstractController{
             return $this->redirectToRoute('bandeja');
         
 }
+    /**
+     * @Route("/eliminarCuenta", name="eliminarCuenta")
+     */
+    public function enviarCorreoEliminarCuenta(MailerInterface $mailer){  
+        if($this->getUser()){
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $this->getUser();
+            $correo = $usuario->getCorreo();
+            $usuario->setRecuperacion(rand(1,2147483647));
+            $entityManager->flush();
+                    
+            $absolute_url = $this->full_url( $_SERVER );
+                        
+            $ruta = substr($absolute_url, 0, -14);
+            $ruta = $ruta . "eliminarUsuario/" .$usuario->getRecuperacion();
+            $email = (new Email())
+            ->from('noreply@telemedicina.com')
+            ->to($correo)
+            ->subject('Elimina tu cuenta')
+            ->html("<a href=\"$ruta\">Eliminar Cuenta</a>");
+            $mailer->send($email);
+            return $this->render('mensaje.html.twig', array('mensaje' => "Se ha enviado un correo a $correo."));
+    }else{
+        return $this->redirectToRoute('ctrl_login');
+    }
+}
+    /**
+     * @Route("/eliminarUsuario/{codigo}", name="eliminarUsuario")
+     */
+    public function eliminarUsuario($codigo = 0) {
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $codigo));
+            if($usuario && $codigo){
+                $entityManager->remove($usuario);
+                $entityManager->flush();
+            }
+            return $this->redirectToRoute('ctrl_logout');
+        
+}
+
+//funciones de url
      function url_origin($s, $use_forwarded_host=false) {
 
         $ssl = ( ! empty($s['HTTPS']) && $s['HTTPS'] == 'on' ) ? true:false;

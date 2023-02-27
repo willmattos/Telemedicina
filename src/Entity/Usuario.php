@@ -52,6 +52,7 @@ class Usuario implements UserInterface, \Serializable
      */
     private $activado;
 
+    private $medico = null;
     /**
      * @return mixed
      */
@@ -115,6 +116,12 @@ class Usuario implements UserInterface, \Serializable
     }
     public function setActivado($activado) {
         $this->activado = $activado;
+    }
+    public function getMedico() {
+        return $this->medico;
+    }
+    public function setMedico($medico) {
+        $this->medico = $medico;
     }
  	// =======================================================
 	// Elementos necesarios para la autenticación

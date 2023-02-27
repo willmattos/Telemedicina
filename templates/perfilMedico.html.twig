@@ -32,9 +32,10 @@
       </tr>
       {% if not medico.getCV() is null %}
       <tr>
+        
         <td>Curriculum:</td>
         <td id="cv">
-          <a href="{{medico.getCV()}}" download>curriculum</a>
+          <a href="{{ asset(medico.getCV()) }}" download>curriculum</a>
         </td>
         </tr>
     {%endif%}

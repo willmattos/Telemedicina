@@ -77,6 +77,10 @@ class Metodos extends AbstractController{
             if($especialidades = $this->comprobarMedico()){
             return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades));
             }
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario = $this->getUser();
+            $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+            if($medico) $usuario->setMedico(1);
             return $this->render('bandeja.html.twig');
         }
         return $this->redirectToRoute('ctrl_login');
@@ -214,14 +218,17 @@ class Metodos extends AbstractController{
             //var_dump($_POST['medicos']);die;
             foreach($_POST['medicos'] as $medico){
                 $entityManager = $this->getDoctrine()->getManager();
-               
+                $medico = $entityManager->find(Medico::class,$medico);
+                $consulas_sin_terminar = $entityManager->getRepository(Consulta::class)->findBy(array('medico' => $medico, 'completado' => 0));
+                if(count($consulas_sin_terminar) < 2 || !$consulas_sin_terminar){
+                
                 //Creamos la consulta
                 $consulta_nueva = new Consulta();
                 $consulta_nueva->setAsunto($_POST['asunto']);
                 $consulta_nueva->setLeido(0);
                 $consulta_nueva->setCompletado(0);
                 $consulta_nueva->setUsuario($this->getUser());
-                $consulta_nueva->setMedico($entityManager->find(Medico::class,$medico));
+                $consulta_nueva->setMedico($medico);
                 $entityManager->persist($consulta_nueva);
                 
                 //Creamos el mensaje
@@ -279,9 +286,14 @@ class Metodos extends AbstractController{
                 $entityManager->flush();
                 $consulta = $consulta_nueva->getCodigo();
             }
+            }
             
         }
-        return $this->redirectToRoute('consulta', array('consulta' => $consulta));
+        if(!isset($consulta)){
+        return $this->redirectToRoute('bandeja');
+        }else{
+            return $this->redirectToRoute('consulta', array('consulta' => $consulta));
+        }
     }
      /**
      * @Route("/bandeja/enviarMensaje", name="enviarMensaje", methods={"POST"})
@@ -451,8 +463,8 @@ class Metodos extends AbstractController{
                 if($medico->getCV()){
                     $filesystem = new Filesystem();
                     $directorio = dirname(__FILE__);
-                    $rutaF = $directorio.'/../../public/Usuarios/u'.$medico->getUsuario()->getId().'/cv/'.'curriculum.pdf';
-                    $rutaP = 'Usuarios/u'.$medico->getUsuario()->getId().'/cv/'.'curriculum.pdf';
+                    $rutaF = $directorio.'/../../public/Usuarios/u'.$medico->getUsuario()->getId().'/cv/'.$medico->getCV();
+                    $rutaP = 'Usuarios/u'.$medico->getUsuario()->getId().'/cv/'.$medico->getCV();
                     $ruta = $filesystem->exists($rutaF);
                     if(!$ruta){
                         $medico->setCV(null);
@@ -535,8 +547,29 @@ class Metodos extends AbstractController{
                 $foto = null;
             }
 
-            array_push($datos, array($medicos[$i]->getUsuario()->getId(),$medicos[$i]->getNumCol(),$medicos[$i]->getUsuario()->getNombre(),$medicos[$i]->getUsuario()->getApellido(),$medicos[$i]->getHospital(),$total,$foto));
+            array_push($datos, array($medicos[$i]->getNumCol(),$medicos[$i]->getUsuario()->getNombre(),$medicos[$i]->getUsuario()->getApellido(),$medicos[$i]->getHospital(),$total,$foto));
         }	
+        return new JsonResponse($datos);
+    
+    }
+    /**
+     * @Route("/disponiblesMedicos/{codigo}", name="disponiblesMedicos", methods={"GET"})
+     */
+    public function disponiblesMedicos($codigo=0) {
+        $entityManager = $this->getDoctrine()->getManager();
+        if($codigo){
+            $medicos = $entityManager->getRepository(Medico::class)->findBy(array('especialidad'=> $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=>$codigo))));
+        }else{
+            $medicos = $entityManager->getRepository(Medico::class)->findAll();
+        }
+        $datos = array();
+        foreach ($medicos as $medico) {
+            # code...
+            $consulas_sin_terminar = $entityManager->getRepository(Consulta::class)->findBy(array('medico' => $medico, 'completado' => 0));
+            if(count($consulas_sin_terminar) < 2 || !$consulas_sin_terminar){
+                array_push($datos, array($medico->getUsuario()->getId(),$medico->getNumCol(),$medico->getUsuario()->getNombre(),$medico->getUsuario()->getApellido()));
+            }
+        }
         return new JsonResponse($datos);
     
     }
@@ -546,32 +579,9 @@ class Metodos extends AbstractController{
 
 
 
-
     
 //Funciones
 
-    //Funcion para crear la carpeta de usuario y dentro de el la de chats
-    private function comprobarcarpetaMensaje($usuario){
-        try {
-            $filesystem = new Filesystem();
-            $finder = new Finder();
-            $directorio = dirname(__FILE__);
-            $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId());
-            if(is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId()) && is_dir($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats')){
-                    echo null;
-            }else{
-                $filesystem->mkdir(
-                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId()),
-                );
-                $filesystem->mkdir(
-                    Path::normalize($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/chats'),
-                );
-            } 
-        }
-        catch (IOExceptionInterface $exception) {
-            echo "An error occurred while creating your directory at ".$exception->getPath();
-        }
-    }
     //Funcion para crear la carpeta de usuario y dentro de el la de cv
     private function comprobarcarpetaCv($usuario){
         try {

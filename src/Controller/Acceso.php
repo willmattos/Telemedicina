@@ -13,7 +13,7 @@ class Acceso extends AbstractController{
      */
     public function login(){    
         return $this->render('login.html.twig');
-    }    
+    }
 	
 	/**
      * @Route("/logout", name="ctrl_logout")

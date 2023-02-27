@@ -79,7 +79,14 @@
     let tdfoto = document.createElement('td')
     let inputfoto = document.createElement('input')
     
+    let tdelimnar = document.createElement('td');
+    let enlace_eliminar = document.createElement('a')
     trfoto.appendChild(tdfoto)
+    trfoto.appendChild(tdelimnar)
+    tdelimnar.appendChild(enlace_eliminar)
+    enlace_eliminar.appendChild(document.createTextNode('Eliminar cuenta'))
+    enlace_eliminar.setAttribute('href',"{{path('eliminarCuenta')}}")
+
     tdfoto.appendChild(inputfoto)
     
     inputfoto.setAttribute('type','file')

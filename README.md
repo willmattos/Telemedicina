@@ -24,14 +24,15 @@ https://github.githistory.xyz/
 
 --------------------------------------------------------------------
 
-hecho//fallo en consultas multiples
+hecho// fallo en consultas multiples
 hecho// archivos en creacion de consulta
-registro @comem
-perfil medicos
-eliminar foto perfil
-recuperar clave
+hecho// registro @comem
+hecho// perfil medicos
+hecho// recuperar clave
+hecho// carga de trabajo
 zona admin (bloquear usuario, modificar informacion)
-carga de trabajo
+eliminar foto perfil
+eliminar cv
 cerrar cuenta
 api publica
 
