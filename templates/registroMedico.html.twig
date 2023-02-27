@@ -1,19 +1,23 @@
 {# templates/registroMedico.html.twig #}
 {% extends 'base.html.twig' %}
 {% block contenido %}  
+{% if error == true %}
+<script>alert("Error con el fichero")</script>
+{% endif %}
+
       <div class="conten">
         <div class="login">
-		<form action="{{ path('remedico')}}" method="post" enctype="multipart/form-data">
+		<form enctype="multipart/form-data" action="{{ path('remedico')}}" method="post" >
           <table>
             <tr><td colspan="2">Termina de completar tus datos</td></tr>
             <tr>
                 <td><label for="">Número de Colegiado:</label></td>
-                <td><input type="text" id="colegiado" name="colegiado" maxlength="9"/></td>
+                <td><input type="text" id="colegiado" name="colegiado" maxlength="9" /></td>
             </tr>
             <tr>
                 <td><label for="">Especialidad:</label></td>
                 <td>
-                    <select name="especialidad" id="especialidad">
+                    <select name="especialidad" id="especialidad" >
                       <option value="" selected>--</option>
                       {% for especialidad in especialidades %}
                       <option value="{{ especialidad.codigo }}">
@@ -25,11 +29,11 @@
             </tr>
             <tr>
               <td><label for="">Hospital:</label></td>
-              <td><input type="text" id="hospital" name="hospital" /></td>
+              <td><input type="text" id="hospital" name="hospital" value=""/></td>
             </tr>
             <tr>
               <td><label for="">Curriculum:</label></td>
-              <td><input type="file" id="cv" name="cv"/></td>
+              <td><input type="file" id="cv" name="cv" /></td>
             </tr>
             <tr>
               <td colspan="2">
