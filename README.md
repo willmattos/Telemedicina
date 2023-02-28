@@ -30,10 +30,9 @@ hecho// registro @comem
 hecho// perfil medicos
 hecho// recuperar clave
 hecho// carga de trabajo
-zona admin (bloquear usuario, modificar informacion)
 eliminar foto perfil
 eliminar cv
-cerrar cuenta
+hecho// cerrar cuenta
 api publica
 
 ---------------------------------------------------------------------------

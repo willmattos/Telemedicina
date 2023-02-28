@@ -17,17 +17,6 @@
     </li>
 
     {%endif%}
-    {% if is_granted('ROLE_ADMIN') %}
-
-    <li>
-      Zona Admin
-      <a href="admin.html">
-        <span class="link"></span>
-      </a>
-    </li>
-
-    {%endif%}
-
     <li>
       Medicos
       <a href="{{ path('medicos') }}">

@@ -8,7 +8,7 @@
   function listar(){
     $("#medicos").html("")
       $.get(
-        "http://localhost/Telemedicina-Symfony/public/medicosPorEspecialidad/" +
+        "{{path('medicosPorEspecialidad')}}"+"/" +
         $("#especialidad").val(),
         function (data) {
           for (i = 0; i < data.length; i++) {

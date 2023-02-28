@@ -33,51 +33,45 @@ use App\Entity\Valoran;
 class Metodos extends AbstractController{
 
     /**
-     * @Route("/remedico", name="remedico")
+     * @Route("/crearMedico", name="crearMedico", methods={"POST"})
      */
-    public function remedico() {
+    public function crearMedico() {
         //var_dump($_FILES);
         //var_dump($_POST);die;
-        if(!isset($_FILES['cv'])){
-            if($this->isGranted('ROLE_USER')){
-                if($especialidades = $this->comprobarMedico()){
-                    return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades, 'error'=>true));
-                }
-            }
-        }
-        
-        if(isset($_FILES)){
-            if($_FILES['cv']['name'] == ''){
-                if($this->isGranted('ROLE_USER')){
-                    if($especialidades = $this->comprobarMedico()){
-                        return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades, 'error'=>true));
+        $entityManager = $this->getDoctrine()->getManager();
+        $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
+            if(isset($_POST['colegiado'],$_POST['hospital'],$_POST['especialidad'])){
+                    $usuario = $this->getUser();
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $comprobarMedico = $entityManager->getRepository(Medico::class)->findOneBy(array('num_col'=> $_POST['colegiado']));
+                    if(!$comprobarMedico && is_numeric($_POST['colegiado']) && strlen($_POST['colegiado']) == 9){
+                        $medico = new Medico();
+                        $medico->setNumCol($_POST['colegiado']);
+                        $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
+                        $medico->setEspecialidad($especialidad);
+                        $medico->setHospital($_POST['hospital']);
+                        $medico->setsuario($usuario);
+                        if(!($_FILES['cv']['name'] == '')){
+                            $medico->setCV($_FILES['cv']['name']);
+                        
+                            $cv = $_FILES['cv']['tmp_name'];
+                            $filesystem = new Filesystem();
+                            $directorio = dirname(__FILE__);
+                            $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
+                            if(!$ruta){
+                                $this->comprobarcarpetaCv($usuario);    
+                            }
+                            $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$_FILES['cv']['name'];
+                            $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$_FILES['cv']['name']); 
+                        }else{
+                             $medico->setCV($_FILES['cv']['name']);
+                        }
+                        $entityManager->persist($medico); 
+                        $entityManager->flush(); 
                     }
-                } 
+            }else{
+                return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades, 'error'=>true));
             }
-            if(isset($_POST)){
-                var_dump($this->getUser()->getId());
-                $usuario = $this->getUser();
-                $entityManager = $this->getDoctrine()->getManager();
-                $medico = new Medico();
-                $medico->setNumCol($_POST['colegiado']);
-                $medico->setEspecialidad($_POST['especialidad']);
-                $medico->setHospital($_POST['hospital']);
-                $medico->setsuario($usuario->getId());
-                $medico->setCV($_FILES['cv']['name']);
-                
-                $cv = $_FILES['cv']['tmp_name'];
-                $filesystem = new Filesystem();
-                $directorio = dirname(__FILE__);
-                $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
-                if(!$ruta){
-                    $this->comprobarcarpetaCv($usuario);    
-                }
-                $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$_FILES['cv']['name'];
-                $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$_FILES['cv']['name']);
-                $entityManager->persist($medico); 
-                $entityManager->flush();   
-            }
-        }
         return $this->redirectToRoute('perfil');
     }
 
@@ -89,11 +83,40 @@ class Metodos extends AbstractController{
         if($this->isGranted('ROLE_USER')){
             $entityManager = $this->getDoctrine()->getManager();
             $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
-            return $this->render('registroMedico.html.twig',array('especialidades' => $especialidades));
+            return $this->render('registroMedico.html.twig',array('especialidades' => $especialidades, 'error'=>true));
+        }else{
+            return $this->redirectToRoute('ctrl_logout');
         }
         return $this->redirectToRoute('ctrl_login');
     }
 
+      /**
+     * @Route("/borrarFotoPerfil", name="borrarFotoPerfil")
+     */
+    public function borrarFotoPerfil() {
+        $entityManager = $this->getDoctrine()->getManager();
+        $usuario = $this->getUser();
+       //setFoto
+        $usuario->setFoto('');
+        $entityManager->flush();
+        return $this->redirectToRoute('perfil');
+    }
+       /**
+     * @Route("/borrarCvPerfil", name="borrarCvPerfil")
+     */
+    public function borrarCvPerfil() {
+        $entityManager = $this->getDoctrine()->getManager();
+        $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=>$this->getUser()->getId()));
+        //Borrar archivo Cv
+        $filesystem = new Filesystem();
+        $directorio = dirname(__FILE__);
+        $rutaF = $directorio.'/../../public/Usuarios/u'.$this->getUser()->getId().'/cv/'.$medico->getCV();
+        $filesystem->remove($rutaF);
+       // Borrar base de datos setCv
+        $medico->setCV('');
+        $entityManager->flush();
+        return $this->redirectToRoute('perfil');
+    }
     private function comprobarMedico(){
         $usuario = $this->getUser();
         $dominio = substr($usuario->getCorreo(),strpos($usuario->getCorreo(), '@')+1);
@@ -115,13 +138,15 @@ class Metodos extends AbstractController{
 
         if($this->isGranted('ROLE_USER')){
             if($especialidades = $this->comprobarMedico()){
-            return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades));
+            return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades ,'error'=>false));
             }
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $this->getUser();
             $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
             if($medico) $usuario->setMedico(1);
             return $this->render('bandeja.html.twig');
+        }else{
+            return $this->redirectToRoute('ctrl_logout');
         }
         return $this->redirectToRoute('ctrl_login');
     }
@@ -165,6 +190,8 @@ class Metodos extends AbstractController{
             $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
             return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico,'especialidades'=>$especialidades, 'cv' =>$rutaP));
         }
+        }else{
+            return $this->redirectToRoute('ctrl_logout');
         }
         return $this->redirectToRoute('bandeja');        
     }
@@ -175,7 +202,7 @@ class Metodos extends AbstractController{
     public function mostrarFormulario() {
         if($this->isGranted('ROLE_USER')){
             if($especialidades = $this->comprobarMedico()){
-                return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades));
+                return $this->render('registroMedico.html.twig', array('especialidades'=> $especialidades , 'error'=>true));
                 }
         $entityManager = $this->getDoctrine()->getManager();
         $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $this->getUser()));
@@ -183,6 +210,8 @@ class Metodos extends AbstractController{
             $especialidades = $entityManager->getRepository(Especialidades::class)->findAll();
             return $this->render('formularioConsulta.html.twig',array('especialidades' => $especialidades));
         }
+        }else{
+            return $this->redirectToRoute('ctrl_logout');
         }
         return $this->redirectToRoute('bandeja');
     }
@@ -193,6 +222,8 @@ class Metodos extends AbstractController{
     public function cargarConsulta($consulta = null) {
         if($this->isGranted('ROLE_USER') && $consulta){
         $entityManager = $this->getDoctrine()->getManager();
+
+        
         $consulta = $entityManager->getRepository(Consulta::class)->findOneBy(array('codigo'=>$consulta));
         if($consulta){
             if(($consulta->getUsuario()->getId() == $this->getUser()->getId()) || ($consulta->getMedico()->getUsuario()->getId() == $this->getUser()->getId())){
@@ -200,6 +231,7 @@ class Metodos extends AbstractController{
                     $nombre = $consulta->getUsuario()->getNombre();
                     $apellido = $consulta->getUsuario()->getApellido();
                     $foto = $consulta->getUsuario()->getFoto();
+                    $this->getUser()->setMedico(1);
                 }else{
                     $nombre = $consulta->getMedico()->getUsuario()->getNombre();
                     $apellido = $consulta->getMedico()->getUsuario()->getApellido();
@@ -246,6 +278,8 @@ class Metodos extends AbstractController{
             }
         }
         
+        }else{
+            return $this->redirectToRoute('ctrl_logout');
         }
         return $this->redirectToRoute('bandeja');
     }
@@ -416,6 +450,8 @@ class Metodos extends AbstractController{
                         $entityManager->flush();
                       }
                 }
+                }else{
+                    return $this->redirectToRoute('ctrl_logout');
                 }
         return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
     }
@@ -442,6 +478,8 @@ class Metodos extends AbstractController{
                     }
                   }
             }
+            }else{
+                return $this->redirectToRoute('ctrl_logout');
             }
     return $this->redirectToRoute('consulta',array('consulta' => $_GET['consulta']));
 }
@@ -454,46 +492,50 @@ class Metodos extends AbstractController{
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $this->getUser();
             $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
-            
-            $usuario->setNombre($_POST['nombre']);
-            $usuario->setApellido($_POST['apellido']);
-
-            if($medico){
-                $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
-                $medico->setEspecialidad($especialidad);
-                $medico->setHospital($_POST['hospital']);
-                $cv = $_FILES['cv']['tmp_name'];
-                $nombre = $_FILES['cv']['name'];
-                $directorio = dirname(__FILE__);
-
-                if($cv){
-                    $medico->setCV($nombre);
-                    $filesystem = new Filesystem();
+            //var_dump($_POST);die;
+            if(isset($_POST['nombre']) && isset($_POST['apellido']) && isset($_POST['hospital']) && isset($_POST['especialidad']) && $_POST['nombre'] && $_POST['apellido']){
+                $usuario->setNombre($_POST['nombre']);
+                $usuario->setApellido($_POST['apellido']);
+    
+                if($medico){
+                    $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
+                    $medico->setEspecialidad($especialidad);
+                    $medico->setHospital($_POST['hospital']);
+                    $cv = $_FILES['cv']['tmp_name'];
+                    $nombre = $_FILES['cv']['name'];
                     $directorio = dirname(__FILE__);
-                    $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
-                    if(!$ruta){
-                        $this->comprobarcarpetaCv($usuario);    
+    
+                    if($cv){
+                        $medico->setCV($nombre);
+                        $filesystem = new Filesystem();
+                        $directorio = dirname(__FILE__);
+                        $ruta = $filesystem->exists($directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/');
+                        if(!$ruta){
+                            $this->comprobarcarpetaCv($usuario);    
+                        }
+                        $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre;
+                        $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre);
                     }
-                    $rutaF = $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre;
-                    $mover = move_uploaded_file($cv, $directorio.'/../../public/Usuarios/u'.$usuario->getId().'/cv/'.$nombre);
                 }
+                //En la tabla usuario
+                
+                if($_FILES['foto']['tmp_name']){
+                    $stream = fopen($_FILES['foto']['tmp_name'],'rb');
+                    $usuario->setFoto(base64_encode(stream_get_contents($stream)));
+                }
+                $entityManager->flush();
             }
-            //En la tabla usuario
             
-            if($_FILES['foto']['tmp_name']){
-                $stream = fopen($_FILES['foto']['tmp_name'],'rb');
-                $usuario->setFoto(base64_encode(stream_get_contents($stream)));
-            }
-          
-            $entityManager->flush();
+        }else{
+            return $this->redirectToRoute('ctrl_logout');
         }
         return $this->redirectToRoute('perfil');
     }
 
     /**
-     * @Route("/medico/{colegiado}", name="medico")
+     * @Route("/medico/{colegiado}", name="medico" )
      */
-    public function perfilMedico($colegiado) {
+    public function perfilMedico($colegiado=0) {
             $entityManager = $this->getDoctrine()->getManager();
             $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('num_col'=>$colegiado));
             if($medico){

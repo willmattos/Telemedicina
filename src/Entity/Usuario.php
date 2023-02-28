@@ -128,10 +128,11 @@ class Usuario implements UserInterface, \Serializable
 	// =======================================================
    public function getRoles()
     {
-        if($this->rol){
-            return array('ROLE_USER','ROLE_ADMIN');            
-            }
-            return array('ROLE_USER');                      
+        if($this->activado){
+            return array('ROLE_USER');  
+        }else{
+            return array('DESACTIVADO_USER');  
+        }                         
 	}
 
     public function getPassword()

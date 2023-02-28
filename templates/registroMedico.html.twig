@@ -2,17 +2,17 @@
 {% extends 'base.html.twig' %}
 {% block contenido %}  
 {% if error == true %}
-<script>alert("Error con el fichero")</script>
+<script>alert("Error con los datos")</script>
 {% endif %}
 
       <div class="conten">
         <div class="login">
-		<form enctype="multipart/form-data" action="{{ path('remedico')}}" method="post" >
+		<form enctype="multipart/form-data" action="{{ path('crearMedico')}}" method="post" >
           <table>
             <tr><td colspan="2">Termina de completar tus datos</td></tr>
             <tr>
                 <td><label for="">Número de Colegiado:</label></td>
-                <td><input type="text" id="colegiado" name="colegiado" maxlength="9" /></td>
+                <td><input type="text" id="colegiado" name="colegiado" maxlength="9" placeholder="9 digitos" /></td>
             </tr>
             <tr>
                 <td><label for="">Especialidad:</label></td>
