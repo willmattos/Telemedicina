@@ -43,6 +43,8 @@ Cuando se cambia la contraseña hay que cambiar el numero de recuperacion a 0 ot
 
 Cuando un archivo es muy grande no funciona.
 
+Cuando 
+
 
 --------Meter en el cmd----------
 composer require symfony/filesystem

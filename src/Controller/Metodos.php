@@ -107,6 +107,7 @@ class Metodos extends AbstractController{
     public function borrarCvPerfil() {
         $entityManager = $this->getDoctrine()->getManager();
         $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=>$this->getUser()->getId()));
+        if(isset($medico)){
         //Borrar archivo Cv
         $filesystem = new Filesystem();
         $directorio = dirname(__FILE__);
@@ -115,6 +116,8 @@ class Metodos extends AbstractController{
        // Borrar base de datos setCv
         $medico->setCV('');
         $entityManager->flush();
+       
+        }
         return $this->redirectToRoute('perfil');
     }
     private function comprobarMedico(){
