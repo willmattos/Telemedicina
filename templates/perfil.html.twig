@@ -87,17 +87,25 @@
     let enlace_cv = document.createElement('a')
     trfoto.appendChild(tdfoto)
     trfoto.appendChild(tdelimnar)
-    trfoto.appendChild(td1elimnar)
-    trfoto.appendChild(td2elimnar)
+   
     tdelimnar.appendChild(enlace_eliminar)
     td1elimnar.appendChild(enlace_img)
     td2elimnar.appendChild(enlace_cv)
     enlace_eliminar.appendChild(document.createTextNode('Eliminar cuenta'))
     enlace_eliminar.setAttribute('href',"{{path('eliminarCuenta')}}")
-    enlace_img.appendChild(document.createTextNode('Borrar Imagen de perfil'))
-    enlace_img.setAttribute('href',"{{path('borrarFotoPerfil')}}")
-    enlace_cv.appendChild(document.createTextNode('Borrar Curriculum de perfil'))
-    enlace_cv.setAttribute('href',"{{path('borrarCvPerfil')}}")
+
+    let usu = "{{ usuario|json_encode() }}";
+    if(usu != 'null'){
+      trfoto.appendChild(td1elimnar)
+      enlace_img.appendChild(document.createTextNode('Borrar Imagen de perfil'))
+      enlace_img.setAttribute('href',"{{path('borrarFotoPerfil')}}")
+    }
+    let cv = "{{ cv|json_encode() }}";
+    if(cv != 'null'){
+      trfoto.appendChild(td2elimnar)
+      enlace_cv.appendChild(document.createTextNode('Borrar Curriculum de perfil'))
+      enlace_cv.setAttribute('href',"{{path('borrarCvPerfil')}}")
+    }
 
     tdfoto.appendChild(inputfoto)
     

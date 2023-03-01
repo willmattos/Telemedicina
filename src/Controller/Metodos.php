@@ -97,7 +97,7 @@ class Metodos extends AbstractController{
         $entityManager = $this->getDoctrine()->getManager();
         $usuario = $this->getUser();
        //setFoto
-        $usuario->setFoto('');
+        $usuario->setFoto(null);
         $entityManager->flush();
         return $this->redirectToRoute('perfil');
     }
@@ -180,7 +180,7 @@ class Metodos extends AbstractController{
         }
         if(!$medico){
             $medico = null;
-            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico));
+            return $this->render('perfil.html.twig',array('usuario' => $usuario,'medico' => $medico, 'cv' =>null));
         }else{
             $filesystem = new Filesystem();
             $directorio = dirname(__FILE__);
@@ -492,14 +492,13 @@ class Metodos extends AbstractController{
      */
     public function actualizarDatos() {
         if($this->isGranted('ROLE_USER')){
-            $entityManager = $this->getDoctrine()->getManager();
-            $usuario = $this->getUser();
-            $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
-            //var_dump($_POST);die;
-            if(isset($_POST['nombre']) && isset($_POST['apellido']) && isset($_POST['hospital']) && isset($_POST['especialidad']) && $_POST['nombre'] && $_POST['apellido']){
+            if(isset($_POST['nombre']) && isset($_POST['apellido']) && $_POST['nombre'] && $_POST['apellido']){
+                $entityManager = $this->getDoctrine()->getManager();
+                $usuario = $this->getUser();
+                $medico = $entityManager->getRepository(Medico::class)->findOneBy(array('usuario'=> $usuario));
+
                 $usuario->setNombre($_POST['nombre']);
                 $usuario->setApellido($_POST['apellido']);
-    
                 if($medico){
                     $especialidad = $entityManager->getRepository(Especialidades::class)->findOneBy(array('codigo'=> $_POST['especialidad']));
                     $medico->setEspecialidad($especialidad);
@@ -523,10 +522,18 @@ class Metodos extends AbstractController{
                 //En la tabla usuario
                 
                 if($_FILES['foto']['tmp_name']){
-                    $stream = fopen($_FILES['foto']['tmp_name'],'rb');
-                    $usuario->setFoto(base64_encode(stream_get_contents($stream)));
+                    if($_FILES['foto']['size'] <= 491810){
+                        $stream = fopen($_FILES['foto']['tmp_name'],'rb');
+                        $usuario->setFoto(base64_encode(stream_get_contents($stream)));  
+                    }else{
+                        $error = true;
+                    }
+                    
                 }
                 $entityManager->flush();
+                if(isset($error)){
+                    return $this->render('mensaje.html.twig', array('mensaje' => "Imagen demasiado grande"));
+                }
             }
             
         }else{
