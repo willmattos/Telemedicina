@@ -297,7 +297,7 @@ class Metodos extends AbstractController{
                 $entityManager = $this->getDoctrine()->getManager();
                 $medico = $entityManager->find(Medico::class,$medico);
                 $consulas_sin_terminar = $entityManager->getRepository(Consulta::class)->findBy(array('medico' => $medico, 'completado' => 0));
-                if(count($consulas_sin_terminar) < 2 || !$consulas_sin_terminar){
+                if(count($consulas_sin_terminar) < 10 || !$consulas_sin_terminar){
                 
                 //Creamos la consulta
                 $consulta_nueva = new Consulta();
@@ -658,7 +658,7 @@ class Metodos extends AbstractController{
         foreach ($medicos as $medico) {
             # code...
             $consulas_sin_terminar = $entityManager->getRepository(Consulta::class)->findBy(array('medico' => $medico, 'completado' => 0));
-            if(count($consulas_sin_terminar) < 2 || !$consulas_sin_terminar){
+            if(count($consulas_sin_terminar) < 10 || !$consulas_sin_terminar){
                 array_push($datos, array($medico->getUsuario()->getId(),$medico->getNumCol(),$medico->getUsuario()->getNombre(),$medico->getUsuario()->getApellido()));
             }
         }
