@@ -247,7 +247,7 @@
 
         <td id="cv">
         {% if not cv is null and not cv is empty and not medico.getCV() is null and not medico.getCV() ==''%}
-          <a href="{{cv}}" download>curriculum.pdf</a>
+          <a href="{{cv}}" download>{{medico.getCV()}}</a>
           {%endif%}
         </td>
       </tr>

@@ -156,7 +156,6 @@ class Correo extends AbstractController{
             $entityManager = $this->getDoctrine()->getManager();
             $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $recuperacion));
             if($usuario && $recuperacion){
-                $usuario->setRecuperacion(0);
                 $usuario->setActivado(1);
                 $entityManager->flush();
                 return $this->render('cambiarContraseña.html.twig', array('recuperacion' => $recuperacion));
@@ -171,7 +170,7 @@ class Correo extends AbstractController{
     public function cambiarContraseña($codigo = 0 ,UserPasswordHasherInterface $passwordHasher) {
         $entityManager = $this->getDoctrine()->getManager();
         $usuario = $entityManager->getRepository(Usuario::class)->findOneBy(array('recuperacion'=> $codigo));
-            if($usuario && $codigo){
+        if($usuario && $codigo){
                 $hashedPassword = $passwordHasher->hashPassword($usuario,$_POST['clave']);
                 $usuario->setClave($hashedPassword);
                 $usuario->setRecuperacion(0);
