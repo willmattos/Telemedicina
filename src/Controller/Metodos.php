@@ -592,11 +592,12 @@ class Metodos extends AbstractController{
             foreach ($consultas as $consulta) {
 
             $mensajes = $entityManager->getRepository(Mensaje::class)->findBy(array('codigo_consulta'=>$consulta));
-
-            if(!$consulta->getLeido() && $mensajes[count($mensajes)-1]->getUsuario()->getId() != $this->getUser()->getId()){
+            if((!$consulta->getLeido()) && $mensajes[count($mensajes)-1]->getUsuario()->getId() != $this->getUser()->getId()){
                 $consulta->setLeido(0);
-            }else{
+            }else if($consulta->getLeido() && $mensajes[count($mensajes)-1]->getUsuario()->getId() == $this->getUser()->getId()){
                 $consulta->setLeido(1);
+            }else{
+                $consulta->setLeido(2);
             }
             # code...
             if($medico){

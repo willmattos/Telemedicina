@@ -27,6 +27,8 @@
           console.log(element);
           if (!element[4]) {
             div.setAttribute("class", "leido");
+          }else if(element[4] == 1){
+            dt.appendChild(document.createTextNode(' ✓✓'))
           }
           $(".contenedor_consultas").append(div);
         });

@@ -11,8 +11,12 @@ class Acceso extends AbstractController{
     /**
      * @Route("/login", name="ctrl_login")
      */
-    public function login(){    
-        return $this->render('login.html.twig');
+    public function login(){ 
+        if(!$this->getUser()){
+            return $this->render('login.html.twig');
+        }
+        return $this->redirectToRoute('bandeja');   
+        
     }
 	
 	/**
