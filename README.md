@@ -4,6 +4,8 @@
 Este proyecto tiene como objetivo la creación de una plataforma web en la que los usuarios puedan crear consultas a medicos de distintas especialidades. Para ser medico debes tener un correo @comem.es, que es la forma en la que la pagina detecta si eres paciente o medico. Los medicos pueden responder consultas y cerrarlas. 
 Los pacientes pueden puntuar las consultas ya cerradas.
 
+Contraseña de los usuarios ya creados: 1234
+
 
 
 ## Instalación
